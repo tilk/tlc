@@ -133,14 +133,14 @@ Definition mem (x:A) (E:fset A) :=
   is_in x (proj1_sig E).
 
 Lemma finite_empty : @finite A LibBag.empty.
-Proof using. exists (@nil A). intros x. rewrite in_empty_eq. auto_false. Qed.
+Proof. exists (@nil A). intros x. rewrite in_empty_eq. auto_false. Qed.
 
 Definition empty : fset A := 
   build_fset finite_empty.
 
 Lemma singleton_finite : forall (x:A),
   finite (LibBag.single x).
-Proof using.
+Proof.
   intros. exists (x::nil). intros y. 
   rewrite in_single_eq. intro_subst. constructor.
 Qed.
@@ -150,7 +150,7 @@ Definition singleton (x : A) :=
 
 Lemma union_finite : forall U V : set A,
   finite U -> finite V -> finite (union U V).
-Proof using.
+Proof.
   introv [L1 E1] [L2 E2]. exists (L1 ++ L2). intros x.
   rewrite in_union_eq. rewrite Mem_app_or_eq. introv [H|H]; auto. 
 Qed.
@@ -160,7 +160,7 @@ Definition union (E F : fset A) :=
 
 Lemma inter_finite : forall U V : set A,
   finite U -> finite V -> finite (inter U V).
-Proof using.
+Proof.
   introv [L1 E1] [L2 E2]. exists (L1 ++ L2). intros x.
   rewrite in_inter_eq. rewrite Mem_app_or_eq. autos*.
 Qed.
@@ -170,7 +170,7 @@ Definition inter (E F : fset A) :=
 
 Lemma remove_finite : forall U V : set A,
   finite U -> finite V -> finite (remove U V).
-Proof using.
+Proof.
   introv [L1 E1] [L2 E2]. exists L1. intros x.
   rewrite in_remove_eq. introv [H1 H2]; auto. 
 Qed.
@@ -227,38 +227,38 @@ Implicit Types E : fset A.
 
 Lemma fset_extens_eq : forall E F,
   (forall x, x \in E = x \in F) -> E = F.
-Proof using.
+Proof.
   unfold mem. intros [U FU] [V FV] H. simpls.
   apply exist_eq. apply in_extens. intros. rewrite* H.
 Qed. 
 
 Lemma fset_extens : forall E F, 
   subset E F -> subset F E -> E = F.
-Proof using. intros. apply fset_extens_eq. extens*. Qed.
+Proof. intros. apply fset_extens_eq. extens*. Qed.
 
 Lemma in_empty : forall x,
   x \in \{} = False.
-Proof using. unfold mem, empty. simpl. intros. rewrite in_empty_eq. autos*. Qed.
+Proof. unfold mem, empty. simpl. intros. rewrite in_empty_eq. autos*. Qed.
 
 Lemma in_singleton : forall x y,
   x \in \{y} = (x = y).
-Proof using. unfold mem, singleton. simpl. intros. rewrite in_single_eq. autos*. Qed.
+Proof. unfold mem, singleton. simpl. intros. rewrite in_single_eq. autos*. Qed.
 
 Lemma in_union : forall x E F,
   x \in (E \u F) = ((x \in E) \/ (x \in F)).
-Proof using. unfold mem, union. simpl. intros. rewrite in_union_eq. autos*. Qed.
+Proof. unfold mem, union. simpl. intros. rewrite in_union_eq. autos*. Qed.
 
 Lemma in_inter : forall x E F,
   x \in (E \n F) = ((x \in E) /\ (x \in F)).
-Proof using. unfold mem, inter. simpl. intros. rewrite in_inter_eq. autos*. Qed.
+Proof. unfold mem, inter. simpl. intros. rewrite in_inter_eq. autos*. Qed.
 
 Lemma in_remove : forall x E F,
   x \in (E \- F) = ((x \in E) /\ (x \notin F)).
-Proof using. unfold mem, remove. simpl. intros. rewrite in_remove_eq. autos*. Qed.
+Proof. unfold mem, remove. simpl. intros. rewrite in_remove_eq. autos*. Qed.
 
 Lemma from_list_spec : forall x L,
   x \in from_list L = Mem x L.
-Proof using.
+Proof.
   unfold from_list. induction L; rew_list.
   rewrite in_empty. rewrite~ Mem_nil_eq. 
   rewrite in_union, in_singleton. rewrite~ Mem_cons_eq. congruence.
@@ -268,7 +268,7 @@ Hint Constructors Mem.
 
 Lemma fset_finite : forall E,
   exists L, E = from_list L.
-Proof using.
+Proof.
   intros [U [L' H]]. exists (filter (fun x => isTrue (is_in x U)) L').
   apply fset_extens_eq. intros x. rewrite from_list_spec.
   unfold mem at 1. simpl. extens. iff M.
@@ -302,38 +302,38 @@ Implicit Types E : fset A.
 
 Lemma in_empty_elim : forall x,
   x \in \{} -> False.
-Proof using. introv H. rewrite~ in_empty in H. Qed.
+Proof. introv H. rewrite~ in_empty in H. Qed.
 
 Lemma in_singleton_self : forall x,
   x \in \{x}.
-Proof using. intros. rewrite~ in_singleton. Qed.
+Proof. intros. rewrite~ in_singleton. Qed.
 
 (** Properties of [union] *)
 
 Lemma union_same : forall E,
   E \u E = E.
-Proof using.
+Proof.
   intros. apply fset_extens;
    intros x; rewrite_all* in_union.
 Qed.
 
 Lemma union_comm : forall E F,
   E \u F = F \u E.
-Proof using.
+Proof.
   intros. apply fset_extens;
    intros x; rewrite_all* in_union.
 Qed.
 
 Lemma union_assoc : forall E F G,
   E \u (F \u G) = (E \u F) \u G.
-Proof using.
+Proof.
   intros. apply fset_extens;
    intros x; rewrite_all* in_union.
 Qed.
 
 Lemma union_empty_l : forall E,
   \{} \u E = E.
-Proof using.
+Proof.
   intros. apply fset_extens; 
    intros x; rewrite_all in_union.
     intros [ H | H ]. false. rewrite~ in_empty in H. auto.
@@ -342,11 +342,11 @@ Qed.
 
 Lemma union_empty_r : forall E,
   E \u \{} = E.
-Proof using. intros. rewrite union_comm. apply union_empty_l. Qed.
+Proof. intros. rewrite union_comm. apply union_empty_l. Qed.
 
 Lemma union_comm_assoc : forall E F G,
   E \u (F \u G) = F \u (E \u G).
-Proof using.
+Proof.
   intros. rewrite union_assoc.
   rewrite (union_comm E F).
   rewrite~ <- union_assoc.
@@ -356,28 +356,28 @@ Qed.
 
 Lemma inter_same : forall E,
   E \n E = E.
-Proof using.
+Proof.
   intros. apply fset_extens;
    intros x; rewrite_all* in_inter.
 Qed.
 
 Lemma inter_comm : forall E F,
   E \n F = F \n E.
-Proof using.
+Proof.
   intros. apply fset_extens;
    intros x; rewrite_all* in_inter.
 Qed.
 
 Lemma inter_assoc : forall E F G,
   E \n (F \n G) = (E \n F) \n G.
-Proof using.
+Proof.
   intros. apply fset_extens;
    intros x; rewrite_all* in_inter.
 Qed.
 
 Lemma inter_empty_l : forall E,
   \{} \n E = \{}.
-Proof using.
+Proof.
   intros. apply fset_extens; 
    intros x; rewrite_all in_inter.
     intros. false* in_empty_elim.
@@ -386,11 +386,11 @@ Qed.
 
 Lemma inter_empty_r : forall E,
   E \n \{} = \{}.
-Proof using. intros. rewrite inter_comm. apply inter_empty_l. Qed.
+Proof. intros. rewrite inter_comm. apply inter_empty_l. Qed.
 
 Lemma inter_comm_assoc : forall E F G,
   E \n (F \n G) = F \n (E \n G).
-Proof using.
+Proof.
   intros. rewrite inter_assoc.
   rewrite (inter_comm E F).
   rewrite~ <- inter_assoc.
@@ -400,21 +400,21 @@ Qed.
 
 Lemma from_list_nil : 
   from_list (@nil A) = \{}.
-Proof using. auto. Qed.
+Proof. auto. Qed.
 
 Lemma from_list_cons : forall x l,
   from_list (x::l) = \{x} \u (from_list l).
-Proof using. auto. Qed.
+Proof. auto. Qed.
 
 (* Properties of [disjoint] *)
 
 Lemma disjoint_comm : forall E F,
   disjoint E F -> disjoint F E.
-Proof using. unfold disjoint. intros. rewrite~ inter_comm. Qed.
+Proof. unfold disjoint. intros. rewrite~ inter_comm. Qed.
 
 Lemma disjoint_in_notin : forall E F x,
   disjoint E F -> x \in E -> x \notin F.
-Proof using.
+Proof.
   unfold disjoint. introv H InE InF. applys in_empty_elim x.
   rewrite <- H. rewrite in_inter. auto.
 Qed.
@@ -423,47 +423,47 @@ Qed.
 
 Lemma notin_empty : forall x,
   x \notin \{}.
-Proof using. intros_all. rewrite~ in_empty in H. Qed.
+Proof. intros_all. rewrite~ in_empty in H. Qed.
 
 Lemma notin_singleton : forall x y,
   x \notin \{y} <-> x <> y.
-Proof using. unfold notin. intros. rewrite* <- in_singleton. Qed.
+Proof. unfold notin. intros. rewrite* <- in_singleton. Qed.
 
 Lemma notin_same : forall x,
   x \notin \{x} -> False.
-Proof using. intros. apply H. apply* in_singleton_self. Qed.
+Proof. intros. apply H. apply* in_singleton_self. Qed.
 
 Lemma notin_union : forall x E F,
   x \notin (E \u F) <-> (x \notin E) /\ (x \notin F).
-Proof using. unfold notin. intros. rewrite* in_union. Qed.
+Proof. unfold notin. intros. rewrite* in_union. Qed.
 
 (** Properties of [subset] *)
 
 Lemma subset_refl : forall E,
   E \c E.
-Proof using. intros_all. auto. Qed.
+Proof. intros_all. auto. Qed.
 
 Lemma subset_empty_l : forall E,
   \{} \c E.
-Proof using. intros_all. rewrite* in_empty in H. Qed.
+Proof. intros_all. rewrite* in_empty in H. Qed.
 
 Lemma subset_union_weak_l : forall E F,
   E \c (E \u F).
-Proof using. intros_all. rewrite* in_union. Qed.
+Proof. intros_all. rewrite* in_union. Qed.
 
 Lemma subset_union_weak_r : forall E F,
   F \c (E \u F).
-Proof using. intros_all. rewrite* in_union. Qed.
+Proof. intros_all. rewrite* in_union. Qed.
 
 Lemma subset_union_2 : forall E1 E2 F1 F2,
   E1 \c F1 -> E2 \c F2 -> (E1 \u E2) \c (F1 \u F2).
-Proof using. introv H1 H2. intros x. do 2 rewrite* in_union. Qed.
+Proof. introv H1 H2. intros x. do 2 rewrite* in_union. Qed.
 
 (** Properties of [remove] *)
 
 Lemma union_remove : forall E F G,
   (E \u F) \- G = (E \- G) \u (F \- G).
-Proof using.
+Proof.
   intros. apply fset_extens; intros x;
   repeat (first [ rewrite in_remove | rewrite in_union ]); autos*.
 Qed.

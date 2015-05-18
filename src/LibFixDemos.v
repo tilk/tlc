@@ -56,7 +56,7 @@ Lemma fix_dfs : forall m i,
   (* Could be added to the statement:
      /\ (forall m i, is_marked m i = false -> 
          nb_unmarked (Dfs dfs m i) < nb_unmarked m). *)
-Proof using. 
+Proof. 
   applys~ FixFun2_fix_partial_inv
     (measure2 (fun m i => nb_unmarked m)) 
     (fun m i m' => nb_unmarked m' < nb_unmarked m).
@@ -101,7 +101,7 @@ Definition stream_family A := stream_mod_family (@eq A).
 
 Lemma stream_mod_similarity : forall A (E:binary A),
   bisimilar_mod E = similar (stream_mod_family E).
-Proof using.
+Proof.
   intros. apply prop_ext_2. intros s1 s2.
   unfold similar. simpl. split.
   intros. apply~ bisimilar_mod_to_upto.
@@ -112,7 +112,7 @@ Hint Resolve stream_mod_similarity.
 
 Lemma stream_similarity : forall A,
   @bisimilar A = similar (stream_family A).
-Proof using. intros. apply stream_mod_similarity. Qed.
+Proof. intros. apply stream_mod_similarity. Qed.
 
 Hint Resolve stream_similarity.
 
@@ -123,7 +123,7 @@ Hint Constructors Forall2.
 
 Lemma stream_mod_cofe : forall A {IA:Inhab A} (E:binary A),
   equiv E -> COFE (stream_mod_family E).
-Proof using.
+Proof.
   introv IA Equiv. apply nat_cofe. typeclass.
   intros. apply~ bisimilar_mod_upto_equiv.
   introv H. exists (diagonal (fun i => u (S i)) 0).
@@ -134,7 +134,7 @@ Proof using.
 Qed.
 
 Lemma stream_cofe : forall A {IA:Inhab A}, COFE (stream_family A).
-Proof using. intros. apply~ stream_mod_cofe. Qed.
+Proof. intros. apply~ stream_mod_cofe. Qed.
 
 Hint Resolve @stream_cofe.
 
@@ -147,7 +147,7 @@ Definition Const1 const1 := (1%nat) ::: const1.
 Definition const1 := FixValMod (@bisimilar nat) Const1.
 
 Lemma const1_fix : const1 === Const1 const1.
-Proof using. 
+Proof. 
   applys~ (FixValMod_fix (stream_family nat)). typeclass.
   intros i s1 s2 H. simpls. destruct~ i.
   unfolds. simpl. constructor~. apply* H.
@@ -162,7 +162,7 @@ Definition Const const (n:nat) := n ::: const n.
 Definition const := FixFunMod (@bisimilar nat) Const.
 
 Lemma const_fix : forall n, const n === Const const n.
-Proof using.
+Proof.
   intros. 
   applys (FixFunMod_corec (stream_family nat) (@pred_true nat)); autos*.
   apply stream_cofe.
@@ -180,7 +180,7 @@ Definition pconst `{IA:Inhab A} := FixFunMod (@bisimilar A) (@PConst A).
 
 Lemma pconst_fix : forall A {IA:Inhab A} (n:A), 
   pconst n === PConst pconst n.
-Proof using.
+Proof.
   intros. 
   applys* (FixFunMod_corec (stream_family A) (@pred_true A)).
   clears n. intros i n s1 s2 _ H. simpls. destruct~ i.
@@ -189,7 +189,7 @@ Qed.
 
 Lemma pconst_spec : forall A {IA:Inhab A} (x:A),
   LibStream.const x === pconst x.
-Proof using.
+Proof.
   intros.
   apply bisimilar_mod_take. induction i. simple~.
   apply* sym_elim. apply* trans_sym_2.
@@ -209,7 +209,7 @@ Definition mu := fst muv.
 Definition mv := snd muv.
 
 Lemma uv_fix : mu === MU mu mv /\ mv === MV mu mv.
-Proof using.
+Proof.
   applys (FixValModMut2_fix 
     (prod_family (stream_family nat) (stream_family nat))).
   apply tuple2_from_proj.
@@ -230,7 +230,7 @@ Definition nats := FixFunMod (@bisimilar nat) Nats.
 
 Lemma nats_fix : forall (n:nat), 
   nats n === Nats nats n.
-Proof using.
+Proof.
   intros. 
   applys (FixFunMod_corec (stream_family nat) (@pred_true nat)); autos*.
   apply stream_cofe.
@@ -247,7 +247,7 @@ Definition dist_to_next A (P:A->Prop) (s:stream A) :=
 
 Lemma eventually_to_dist : forall A (P:A->Prop) s,
   eventually P s -> exists n, first_st_at P s n.
-Proof using.
+Proof.
   introv H. induction H. exists 0. simple~.
   destruct (classic (P x)).
     exists 0. simple~.
@@ -257,7 +257,7 @@ Qed.
 Lemma eventually_dist_cons : forall A (P:A->Prop) s x,
   eventually P s -> ~ P x -> 
   dist_to_next P s < dist_to_next P (x:::s).
-Proof using.
+Proof.
   introv H Nx. unfold dist_to_next.
   spec_epsilon as n Pn. apply~ eventually_to_dist.
   spec_epsilon as n' Pn'. apply~ eventually_to_dist.
@@ -280,7 +280,7 @@ Definition filter := FixFunMod (@bisimilar A) Filter.
 Lemma filter_fix : forall s,
   infinitely_often P s ->
   filter s === Filter filter s.
-Proof using.
+Proof.
   applys~ (FixFunMod_mixed_partial 
     (stream_family A)  
     (measure (dist_to_next P))
@@ -313,7 +313,7 @@ Definition log := FixFun Log.
 
 Lemma fix_log : forall n, 
   log n = Log log n.
-Proof using. 
+Proof. 
   applys~ (FixFun_fix (@lt nat _)). 
   introv H. unfolds. case_if~. 
   fequals. apply H. apply* div2_lt.
@@ -323,7 +323,7 @@ Qed.
 
 Lemma log_double : forall n, n > 0 ->
   log(2*n) = 1 + log n.
-Proof using.
+Proof.
   introv Pos. rewrite fix_log. unfold Log.
   case_if*. fequals. rewrite~ div2_double.
 Qed.
@@ -332,7 +332,7 @@ Qed.
 
 Lemma log_grows : forall n m, 
   m <= n -> log m <= log n.
-Proof using.
+Proof.
   induction n using peano_induction. introv Le.
   do 2 rewrite fix_log. unfolds Log.
   (do 2 case_if); autos*.
@@ -366,7 +366,7 @@ Definition only_even := FixFun Only_even.
 
 Lemma only_even_fix : forall n, even n ->
   only_even n = Only_even only_even n.
-Proof using.
+Proof.
   applys~ (FixFun_fix_partial (@lt nat _)).
   intros f1 f2 n Pn IH. unfolds. case_if~. case_if as C.
   subst. inverts Pn as Pn'. inverts Pn'.
@@ -388,7 +388,7 @@ Definition gcd := FixFun2 Gcd.
 
 Lemma fix_gcd : forall x y, 
   gcd x y = Gcd gcd x y.
-Proof using.
+Proof.
   applys~ (FixFun2_fix (measure2 plus)).
   unfold measure2. introv IH. unfolds.
   case_if~. case_if~. case_if. apply* IH. apply* IH.
@@ -409,7 +409,7 @@ Implicit Arguments FixFun_fix_partial_inv [A B F f].
 
 Lemma zero_fix : forall x, zero x = Zero zero x 
               /\ forall x, zero x = 0.
-Proof using.
+Proof.
   forwards~ [H1 H2]: (FixFun_fix_partial_inv lt pred_true (fun (x y : nat) => y = 0) _ (F:=Zero)).
   introv _ H. unfold Zero. case_if~. 
   forwards* [H1 H2]: (H (x-1)). rewrite <- H1. rewrite H2. apply* H.
@@ -430,7 +430,7 @@ Definition ack := FixFun2 Ack.
 
 Lemma fix_ack : forall m n,
   ack m n = Ack ack m n.
-Proof using.
+Proof.
   applys~ (FixFun2_fix (lexico2 (@lt nat _) (@lt nat _))).
   introv IH. unfolds. case_if~. case_if~. 
   apply IH. emaths. 
@@ -457,7 +457,7 @@ Definition McCarthy_post n r :=
 Lemma McCarthy_fix_post : 
      (forall n, mcCarthy n = McCarthy mcCarthy n)
   /\ (forall n, McCarthy_post n (mcCarthy n)).
-Proof using.
+Proof.
   sets meas: (fun n => If n > 100 then 0 else 101 - n).
   applys~ (FixFun_fix_inv (measure meas)). introv IH. 
   unfold McCarthy. unfold McCarthy_post. case_if~.
@@ -472,17 +472,17 @@ Qed.
 
 Lemma McCarthy_fix : forall n, 
   mcCarthy n = McCarthy mcCarthy n.
-Proof using. apply (proj1 (McCarthy_fix_post)). Qed.
+Proof. apply (proj1 (McCarthy_fix_post)). Qed.
 
 Lemma McCarthy_spec_gt100 : forall n,
   n > 100 -> mcCarthy n = n - 10.
-Proof using.
+Proof.
   introv Lt. lets H: (proj2 McCarthy_fix_post n). unfolds in H. case_if*.
 Qed.
 
 Lemma McCarthy_spec_le100 : forall n,
   n <= 100 -> mcCarthy n = 91.
-Proof using.
+Proof.
   introv Le. lets H: (proj2 McCarthy_fix_post n). unfolds in H. case_if*.
 Qed.
 
@@ -506,7 +506,7 @@ Definition div := FixFun2 Div.
 
 Lemma fix_div : forall n m, m <> 0 -> 
   div n m = Div div n m.
-Proof using.
+Proof.
   applys~ (FixFun2_fix_partial (measure (@fst nat nat))).
   introv Posm IH. unfold Div. case_if~.
   rewrite~ IH. unfolds. simpl. math. 
@@ -524,7 +524,7 @@ Definition Mem A (x:A) l := Exists (=x) l. (* todo: move *)
 Lemma map_congr : forall A B (f1 f2 : A->B) l,
   (forall x, Mem x l -> f1 x = f2 x) ->
   LibList.map f1 l = LibList.map f2 l.
-Proof using. Hint Constructors Exists. Hint Unfold Mem.
+Proof. Hint Constructors Exists. Hint Unfold Mem.
   introv H. induction l. auto. rew_map. fequals~.
 Qed.
 
@@ -535,7 +535,7 @@ Inductive tree : Type :=
   | node : list tree -> tree.
 
 Instance tree_inhab : Inhab tree.
-Proof using. intros. apply (prove_Inhab (leaf 0)). Qed.
+Proof. intros. apply (prove_Inhab (leaf 0)). Qed.
 
 (** An induction principle for trees *)
 
@@ -566,7 +566,7 @@ Lemma tree_induct : forall (P : tree -> Prop),
   (forall l : list tree, 
     (forall t, Mem t l -> P t) -> P (node l)) ->
   forall T : tree, P T.
-Proof using.
+Proof.
   introv Hl Hn. eapply tree_induct_gen with (Q := fun l =>
     forall t, Mem t l -> P t); intros.
   auto. auto. inversions H. inversions~ H1.
@@ -581,7 +581,7 @@ Inductive subtree : binary tree :=
 Hint Constructors subtree.
 
 Lemma subtree_wf : wf subtree.
-Proof using.
+Proof.
   intros t. induction t using tree_induct;
   constructor; introv K; inversions~ K.
 Qed.
@@ -598,7 +598,7 @@ Definition treeincr := FixFun Treeincr.
 
 Lemma treeincr_fix : forall t, 
   treeincr t = Treeincr treeincr t.
-Proof using.
+Proof.
   applys (FixFun_fix subtree).
   reflexivity. apply subtree_wf.
   introv H. unfold Treeincr. destruct x.
@@ -622,7 +622,7 @@ CoInductive itree : Type :=
 (** The type [itree] is inhabited *)
 
 Instance itree_inhab : Inhab itree.
-Proof using. intros. apply (prove_Inhab (itree_leaf 0)). Qed.
+Proof. intros. apply (prove_Inhab (itree_leaf 0)). Qed.
 
 (** Similarity up to level [i] between two trees *)
 
@@ -642,7 +642,7 @@ Fixpoint itree_similar_upto (i:nat) (m1 m2: itree) :=
 
 Lemma itree_similar_upto_equiv : 
   forall i, equiv (itree_similar_upto i).
-Proof using.
+Proof.
   constructor; unfolds.
   induction i; intros; simple~. destruct~ x. 
   induction i; intros; simple~. destruct x; destruct y; simpls*.
@@ -681,7 +681,7 @@ CoFixpoint itree_diagonal (u:nat->itree) : itree :=
   end.
  
 Lemma itree_family_COFE : COFE itree_family.
-Proof using.
+Proof.
   apply~ nat_cofe'. typeclass.
   introv H. exists (itree_diagonal (shifts u)).
   cuts M: (forall k i u, i <= k -> 
@@ -738,7 +738,7 @@ CoInductive itree_similar : binary itree :=
 Hint Constructors itree_similar.
 
 Lemma itree_similar_eq : itree_similar = similar itree_family.
-Proof using.
+Proof.
   apply prop_ext_2. intros t1 t2. iff H.
   intros i. hnf. gen t1 t2. induction i; simpl; introv H.
    auto. inversions~ H.
@@ -766,7 +766,7 @@ Definition product := FixFun2Mod itree_similar Product.
 
 Lemma product_fixpoint : forall m1 m2, 
   itree_similar (product m1 m2) (Product product m1 m2).
-Proof using. 
+Proof. 
   apply (FixFun2Mod_corec itree_family).
   reflexivity. apply itree_similar_eq. apply itree_family_COFE.
   simpl. introv H. destruct i. simple~. unfold Product.
@@ -779,7 +779,7 @@ Lemma product_incr_similarity : forall i m1 m1' m2 m2',
    itree_similar_upto i m1 m1' ->
    itree_similar_upto i m2 m2' ->
    itree_similar_upto (S i) (product m1 m2) (product m1' m2').
-Proof using.
+Proof.
   induction i using peano_induction.
   change (itree_similar_upto) with (family_sim itree_family).
   introv K1 K2. (* todo: setoid rewrite *)
@@ -812,7 +812,7 @@ Definition makeitree := FixFunMod itree_similar Makeitree.
 
 Lemma makeitree_fixpoint : forall m, 
   itree_similar (makeitree m) (Makeitree makeitree m).
-Proof using.
+Proof.
   apply (FixFunMod_corec_total itree_family).
   reflexivity. apply itree_similar_eq. apply itree_family_COFE.
   introv H. unfold Makeitree. simpl. destruct x.
@@ -945,7 +945,7 @@ Inductive regexp_sub : binary regexp :=
 Hint Constructors regexp_sub.
 
 Lemma regexp_sub_wf : wf regexp_sub.
-Proof using. intros r. induction r; constructor; intros r' le; inverts~ le. Qed.
+Proof. intros r. induction r; constructor; intros r' le; inverts~ le. Qed.
 
 Hint Resolve regexp_sub_wf : wf.
 
@@ -954,22 +954,22 @@ Hint Resolve regexp_sub_wf : wf.
 Definition text_sub : binary text := tclosure (@list_sub _).
 
 Lemma text_sub_wf : wf text_sub.
-Proof using. lets: tclosure_wf. unfold text_sub. prove_wf. Qed.
+Proof. lets: tclosure_wf. unfold text_sub. prove_wf. Qed.
 
 Hint Resolve text_sub_wf : wf.
 
 Lemma text_sub_once : forall s c,
   text_sub s (c::s).
-Proof using. intros. apply~ tclosure_once. Qed.
+Proof. intros. apply~ tclosure_once. Qed.
 
 Lemma text_sub_trans : trans text_sub.
-Proof using. apply tclosure_trans. Qed.
+Proof. apply tclosure_trans. Qed.
 
 Hint Resolve text_sub_trans text_sub_once.
 
 Lemma text_sub_app : forall s s1 s2,
   s = s1 ++ s2 -> large text_sub s2 s.
-Proof using.
+Proof.
   intros. subst. induction s1; rew_list. auto.
   inverts IHs1.
     left. applys~ (@trans_elim text) (s1++s2).
@@ -983,7 +983,7 @@ Definition parse_sub : binary (regexp * text) :=
   lexico2 regexp_sub text_sub.
 
 Lemma parse_sub_wf : wf parse_sub.
-Proof using. prove_wf. Qed.
+Proof. prove_wf. Qed.
 
 Hint Unfold parse_sub.
 Hint Resolve parse_sub_wf : wf.
@@ -996,7 +996,7 @@ Definition parse_arg_sub : binary arg_type :=
                parse_sub (r1,s1) (r2,s2).
 
 Lemma parse_arg_sub_wf : wf parse_arg_sub.
-Proof using.
+Proof.
   intros [[r s] k].
   sets_eq p: (r,s). gen k r s. induction_wf IH: parse_sub_wf p.
   intros. subst p. constructor. intros [[r2 s2] k2] S. applys~ IH S. 
@@ -1043,7 +1043,7 @@ Definition parse' := FixFun Parse'.
 
 Lemma parse'_fix : forall p, 
   parse' p = Parse' parse' p.
-Proof using. 
+Proof. 
   applys~ (FixFun_fix parse_arg_sub).
   intros f1 f2 [[r s] k] H. unfolds. destruct r; auto.
   fequal; auto 7.
@@ -1071,7 +1071,7 @@ Definition select_sub (r:regexp) : binary text :=
 Lemma parse'_cont : forall r s k1 k2, normal r ->
   (forall s', select_sub r s' s -> k1 s' = k2 s') ->
   parse' (r,s,k1) = parse' (r,s,k2).
-Proof using.
+Proof.
   intros r s. sets_eq p: (r,s). gen r s. induction_wf IH: parse_sub_wf p.
   introv P N E. subst p. do 2 rewrite parse'_fix. unfolds. destruct r; simpl in N.
   auto.
@@ -1116,7 +1116,7 @@ Qed.
    
 Lemma parse'_fix_Parse : 
   fixed_point (pfunc_equal parse_dom) Parse parse'.
-Proof using.
+Proof.
   intros f Hf [[r s] k] N. asserts E: (pfunc_equal parse_dom f parse').
     unfolds. apply~ equiv_sym. clear Hf.
   rewrite~ E. rewrite parse'_fix.
@@ -1137,7 +1137,7 @@ Qed.
 Lemma Parse_contractive_for_parse' : forall f' p, parse_dom p ->
   (forall q, parse_dom q -> parse_arg_sub q p -> parse' q = f' q) ->
   Parse parse' p = Parse f' p.
-Proof using.
+Proof.
   introv N IH. unfold Parse. destruct p as [[r s] k].
   hnf in N. destruct r; simpl in N; auto.
   inverts N. fequals; apply~ IH. 
@@ -1156,14 +1156,14 @@ Qed.
 
 Lemma parse_fix : forall p, parse_dom p ->
   parse p = Parse parse p.
-Proof using.
+Proof.
   applys~ (FixFun_fix_partial' (P:=parse_dom) (R:=parse_arg_sub) (F:=Parse) (f':=parse')).
   applys Parse_contractive_for_parse'. apply parse'_fix_Parse.
 Qed.
 
 Corollary parse_fix' : forall r s k, normal r ->
   parse (r,s,k) = Parse parse (r,s,k).
-Proof using. intros. applys~ parse_fix. Qed.
+Proof. intros. applys~ parse_fix. Qed.
 
 
 (* ---------------------------------------------------------------------- *)
@@ -1209,10 +1209,10 @@ Definition Parse'_alternative := Parse_common asserts.
     with the one we had written by hand previously. *)
 
 Lemma Parse_alternative_correct : Parse = Parse_alternative.
-Proof using. reflexivity. Qed.
+Proof. reflexivity. Qed.
 
 Lemma Parse'_alternative_correct : Parse' = Parse'_alternative.
-Proof using. reflexivity. Qed.
+Proof. reflexivity. Qed.
 
 
 (* ---------------------------------------------------------------------- *)
@@ -1246,7 +1246,7 @@ Hint Constructors sem.
 
 Lemma sem_productive : forall r s,
   sem r s -> productive r -> s <> nil.
-Proof using.
+Proof.
   introv S. induction S; introv P; simpl in P; auto_false*.
   intros E. destruct (app_eq_nil_inv E). subst. destruct* P.
 Qed.
@@ -1261,7 +1261,7 @@ Definition is_nil (s:text) :=
 
 Lemma sem_to_parse_ind : forall r s s' k,
   sem r s -> normal r -> k s' = true -> parse (r, s ++ s', k) = true.
-Proof using.
+Proof.
   introv S N K. gen s' k N. induction S; intros; 
    (rewrite parse_fix; [ | apply N ]); unfold Parse at 1; simpl in N; 
    (try match type of N with _ /\ _ => destruct N end).
@@ -1276,7 +1276,7 @@ Qed.
 
 Corollary sem_to_parse : forall r s,
   sem r s -> normal r -> parse (r,s,is_nil) = true.
-Proof using. intros. forwards~ M: (@sem_to_parse_ind r s nil is_nil). rew_list~ in M. Qed.
+Proof. intros. forwards~ M: (@sem_to_parse_ind r s nil is_nil). rew_list~ in M. Qed.
 
 (** The second result asserts the reciprocal: if the parse function
     applied to [r] and [s] returns true, then [s] matches [r] semantically. *)
@@ -1284,7 +1284,7 @@ Proof using. intros. forwards~ M: (@sem_to_parse_ind r s nil is_nil). rew_list~ 
 Lemma parse_to_sem_ind : forall r s k, 
   normal r -> parse (r,s,k) = true ->  
   exists s1 s2, s = s1 ++ s2 /\ sem r s1 /\ k s2 = true.
-Proof using.
+Proof.
   introv N P. sets_eq p: (r,s). gen r s k.
   induction_wf IH: parse_sub_wf p. intros. subst p.
   rewrite~ parse_fix in P. unfold Parse in P. destruct r; 
@@ -1312,7 +1312,7 @@ Qed.
 
 Corollary parse_to_sem : forall r s, 
   normal r -> parse (r,s,is_nil) = true -> sem r s.
-Proof using.
+Proof.
   intros. forwards~ (s1&s2&E&S&K): (@parse_to_sem_ind r s is_nil). 
   subst. destruct s2; tryfalse. rew_list~ in *.
 Qed.
@@ -1322,13 +1322,13 @@ Qed.
 
 Theorem parse_iff_sem : forall r s, normal r -> 
   (parse (r,s,is_nil) = true <-> sem r s).
-Proof using. split. apply~ parse_to_sem. intros. apply~ sem_to_parse. Qed.
+Proof. split. apply~ parse_to_sem. intros. apply~ sem_to_parse. Qed.
 
 (** A similar, more general, result *)
 
 Theorem parse_iff_sem_ind : forall r s k, normal r ->
   (parse (r,s,k) = true <-> (exists s1 s2, s = s1 ++ s2 /\ sem r s1 /\ k s2 = true)).
-Proof using.
+Proof.
   split. intros. apply~ parse_to_sem_ind.
   intros (s1&s2&?&?&?). subst. apply~ sem_to_parse_ind.
 Qed.

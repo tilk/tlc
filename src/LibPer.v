@@ -28,7 +28,7 @@ Definition per_dom A (R:binary A) :=
 Lemma per_empty:
   forall A,
   per (@LibRelation.empty A).
-Proof using.
+Proof.
   unfold LibRelation.empty.
   constructor.
   unfold sym. eauto.
@@ -38,7 +38,7 @@ Qed.
 Lemma per_dom_empty:
   forall A,
   per_dom (@LibRelation.empty A) = empty.
-Proof using.
+Proof.
   reflexivity.
 Qed.
 
@@ -60,11 +60,11 @@ Definition per_add_edge A (B:binary A) (x y:A) :=
 
 Lemma per_add_edge_le : forall A (B:binary A) a b,
   Rel.incl B (per_add_edge B a b).
-Proof using. introv. intros x y H. apply stclosure_step. left~. Qed.
+Proof. introv. intros x y H. apply stclosure_step. left~. Qed.
 
 Lemma add_edge_already : forall A (B:binary A) a b,
   per B -> B a b -> per_add_edge B a b = B.
-Proof using.
+Proof.
   introv P H. extens. intros x y. iff M.
   induction M.
     destruct H0. auto. destruct H0. subst~.
@@ -76,7 +76,7 @@ Qed.
 
 Lemma per_add_edge_per : forall A (R : binary A) a b,
   per R -> per (per_add_edge R a b).
-Proof using.
+Proof.
   introv [Rs Rt]. unfold per_add_edge. constructor.
   introv H. induction* H.
   introv H1. gen z. induction* H1. 
@@ -85,7 +85,7 @@ Qed.
 Lemma per_dom_add_edge : forall A (B:binary A) x y,
   per B -> x \in per_dom B -> y \in per_dom B -> 
   per_dom (per_add_edge B x y) = per_dom B \u \{x} \u \{y}.
-Proof using.
+Proof.
   introv [Sy Tr] Bx By. unfold per_add_edge. apply set_ext. intros z.
   unfold Rel.union. unfold per_dom. unfold per_single.
   do 2 rewrite in_union_eq, in_set_st_eq. do 2 rewrite in_single_eq.
@@ -101,7 +101,7 @@ Qed.
 
 Lemma per_add_node_per : forall A (B:binary A) r,
   per B -> per (per_add_node B r).
-Proof using.
+Proof.
   introv [Sy Tr]. unfold per_add_node, per_single, Rel.union.
   constructors.
   intros_all. hnf in Sy. intuition.  
@@ -110,7 +110,7 @@ Qed.
 
 Lemma per_dom_add_node : forall A (B:binary A) x,
   per_dom (per_add_node B x) = per_dom B \u \{x}.
-Proof using.
+Proof.
   intros. unfold per_add_node. apply set_ext. intros y.
   unfold Rel.union. unfold per_dom. unfold per_single.
   rewrite in_union_eq. rewrite in_single_eq. do 2 rewrite in_set_st_eq. 
@@ -120,19 +120,19 @@ Qed.
 (* TODO: rename lemma *)
 Lemma prove_per_single : forall A (x y : A),
   (per_single x y) x y.
-Proof using.
+Proof.
   unfold per_single. eauto.
 Qed.
 
 (* TODO: move instance *)
 Global Instance binary_incl : forall A, BagIncl (binary A).
-Proof using. constructor. rapply (@LibRelation.incl A). Defined.
+Proof. constructor. rapply (@LibRelation.incl A). Defined.
 
 
 Lemma per_add_edge_covariant : forall A (B1 B2 : binary A) x y,
   incl B1 B2 ->
   incl (per_add_edge B1 x y) (per_add_edge B2 x y).
-Proof using.
+Proof.
   unfold binary_incl. unfold per_add_edge.
   (* TODO: was     eauto using stclosure_le, union_covariant. *)
   introv M. applys stclosure_le. applys* union_covariant.
@@ -140,7 +140,7 @@ Qed.
 
 Lemma per_add_edge_symmetric : forall A (B : binary A) x y,
   per_add_edge B y x = per_add_edge B x y.
-Proof using.
+Proof.
   unfold per_add_edge. intros.
   (* If two relations have the same symmetric closure, then
      they have the same symmetric-transitive closure. *)

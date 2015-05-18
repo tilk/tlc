@@ -35,19 +35,19 @@ Context {A:Type} {m:monoid_def A}.
 Global Instance Monoid_Monoid_assoc : 
   forall {M:Monoid m},
   Monoid_assoc (m:=m).
-Proof using.
+Proof.
   constructor. destruct M as [U ? ?]. destruct m. simpl. apply U.
 Qed.
 Global Instance Monoid_Monoid_neutral_l :
   forall {M:Monoid m},
   Monoid_neutral_l (m:=m).
-Proof using.
+Proof.
   constructor. destruct M as [? U ?]. destruct m. simpl. apply U.
 Qed.
 Global Instance Monoid_Monoid_neutral_r : 
   forall {M:Monoid m},
   Monoid_neutral_r (m:=m).
-Proof using.
+Proof.
   constructor. destruct M as [? ? U]. destruct m. simpl. apply U.
 Qed.
 End MonoidInst.
@@ -57,7 +57,7 @@ End MonoidInst.
 
 Instance monoid_plus_zero:
   Monoid (monoid_ plus 0).
-Proof using.
+Proof.
   constructor; repeat intro; omega.
 Qed.
 

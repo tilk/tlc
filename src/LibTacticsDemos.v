@@ -19,7 +19,7 @@ Variables P1 P2 P3 : nat -> Prop.
 
 Lemma demo_false_1 : 
   forall (n:nat), (forall m, m = n -> False) -> H1.
-Proof using.
+Proof.
   intros n P. dup 5.
   (* [false_goal] replaces the current goal by [False] *)
   false. eapply P. reflexivity.
@@ -35,7 +35,7 @@ Qed.
 
 Lemma demo_false_2 : 
   0 = 1 -> 1 = 2.
-Proof using.
+Proof.
   intros. dup 3.
   (* [contradiction] does not cover [discriminate] *)
   try contradiction. skip. 
@@ -46,7 +46,7 @@ Qed.
 
 Lemma demo_false_3 : 
   (forall b, b = false) -> False.
-Proof using.
+Proof.
   introv H. dup.
   (* [false E] is able to use [forwards E] to exhibit 
      a contradiction. *)
@@ -57,7 +57,7 @@ Qed.
 
 Lemma demo_tryfalse : 
   forall n, S n = 1 -> n = 0.
-Proof using.
+Proof.
   intros. dup 2.
   (* often in a case analysis, several subcases are absurd. example: *)
   destruct n. auto. false.
@@ -67,7 +67,7 @@ Qed.
 
 Lemma demo_asserts_cuts :
   True.
-Proof using.
+Proof.
   dup 7.
   (* here is another syntax for assert *)
   asserts U: H2. skip. skip.
@@ -91,7 +91,7 @@ Qed.
 
 Lemma demo_lets : 
   (H1 -> H2 -> H3 /\ H4) -> (H1 -> H2) -> H1 -> H3.
-Proof using.
+Proof.
   intros P Q R.
   (* [lets] is a tactic for naming a term *) 
   lets U: (Q R). 
@@ -114,7 +114,7 @@ Definition Dup x := x + x.
 
 Lemma demo_applys : forall P : (nat -> nat) -> nat -> Prop,
   (forall f, P f (f 0)) -> P Dup 0. 
-Proof using.
+Proof.
   intros. dup 4.
   (* while apply is able to do some unification *)
   apply (H Dup).
@@ -128,7 +128,7 @@ Qed.
 
 Lemma demo_applys_to :
   (H1 -> H2 -> H3 /\ H4) -> (H1 -> H2) -> H1 -> H3.
-Proof using.
+Proof.
   introv P Q R. dup.
   (* [applys_to R] is used to apply a lemma to [R] and name R the result *)
   applys_to R Q. skip.
@@ -146,7 +146,7 @@ Variables P1 P2 P3 : nat -> Prop.
 
 Lemma demo_introv_1 :
   forall a b, P1 a -> P2 b -> forall c d, P3 c -> P1 d -> c = b.
-Proof using.
+Proof.
   dup 4.
   (* [introv] introduces all the variables which are not hypotheses,
      more precisely all the variables used dependently. *) 
@@ -167,7 +167,7 @@ Definition Sym (x:nat) := forall y, x = y -> Same y x.
 
 Lemma demo_introv_2 :
   forall a, Sym a.
-Proof using.
+Proof.
   dup 4.
   (* [introv] introduces a variable but no subsequent definition *)
   introv. 
@@ -183,7 +183,7 @@ Qed.
 
 Lemma demo_introv_3 :
   forall a, a = 0 -> Sym a.
-Proof using.
+Proof.
   dup 5. (* more examples *)
   (* introduces [a] only *)
   introv. skip.
@@ -201,7 +201,7 @@ Definition TestSym := (forall a, a = 0 -> Sym a).
 
 Lemma demo_introv_4 :
   TestSym.
-Proof using.
+Proof.
   dup 2. (* same as before, except the goal itself is a definition *)
   (* introduces [a] only *)
   introv. skip.
@@ -211,7 +211,7 @@ Qed.
 
 Lemma demo_introv_5 :
   forall a, a = 0 -> ~ Sym a.
-Proof using.
+Proof.
   dup 2. (* playing with negation *)
   (* introduces [a = 0] *)
   introv E. skip.
@@ -226,7 +226,7 @@ Definition AllSame := forall x, AllSameAs x.
 
 Lemma demo_introv_6 :
   AllSame.
-Proof using.
+Proof.
   dup 2. 
   (* introduces only [x], then only [y] *)
   introv. introv. skip.
@@ -238,7 +238,7 @@ Definition AllSameAgain := AllSame.
 
 Lemma demo_introv_7 :
   AllSameAgain.
-Proof using.
+Proof.
   dup 2.  
   (* introduces only [x], then only [y] *)
   introv. introv. skip.
@@ -248,7 +248,7 @@ Qed.
 
 Lemma demo_introv_8 :
   forall a (c:nat) b, P1 a -> P2 b -> True.
-Proof using.
+Proof.
   (* notice that variables which are not used dependently
      are treated as hypotheses, e.g. variable [c] below.
      This might not be the desired behaviour, but that's
@@ -261,7 +261,7 @@ Definition IMP P A (x y : A) := P -> x = y.
 Lemma demo_intros_all :
      (forall a b, P1 a -> P2 b -> IMP H1 a b)
   /\ (forall a b, a = 0 -> b = 1 -> ~ (a = b)).
-Proof using.
+Proof.
   split.
   (* [intros_all] introduces as many arguments as possible *)
   intros_all. skip.
@@ -276,7 +276,7 @@ Definition testing f :=
   forall (x:nat), f x -> True.
 
 Lemma demo_introv_what_to_do : testing (fun a => a = 0).
-Proof using.   
+Proof.   
   dup.
     intro. skip. (* does beta-reduce f *)
     hnf. intro. skip. (* does not beta-reduce f *)
@@ -291,7 +291,7 @@ End IntrovTest.
 Lemma demo_gen_and_generalizes :
   forall P Q : nat -> nat -> nat -> Prop,
   forall a b c, P a b c -> Q a a a -> P b b c -> True.
-Proof using.
+Proof.
   intros. dup 3.
   (* [gen] generalizes an hypothesis and clears it *)
   gen H. skip.
@@ -310,7 +310,7 @@ Inductive ind : nat -> Prop :=
 
 Lemma demo_sets_and_set_eq_and_sets_eq : forall n,
   ind (3 + n) -> ind (7 + n) -> ind (7 + n).
-Proof using.
+Proof.
   introv M1 M2. dup 9.
   (* [sets] introduces a name and performs the substitution *)
   sets a: (3+n). skip.
@@ -335,7 +335,7 @@ Lemma demo_sets_let_and_sets_eq_let : forall n1 n2 : nat,
   (let x := n1 + n2 in x = x) ->
   (let y := n2 + n1 in let z := y + y in z = z) ->
   (let t := n1 + n1 in t = t).
-Proof using.
+Proof.
   intros n1 n2 M1 M2. dup 3.
   (* [sets_let x] introduces a local definition for a let;
      note that, due to a limitation of Coq, only one local
@@ -353,7 +353,7 @@ Qed.
 
 Lemma demo_check_noevar_goal : forall (n:nat),
   (forall m, m = n -> True) -> True.
-Proof using.
+Proof.
   intros. check_noevar_goal. eapply H.
   try check_noevar_goal. dup.
   reflexivity. check_noevar_goal. auto.
@@ -367,7 +367,7 @@ Definition Id A (x:A) := x.
 
 Lemma demo_unfolds_folds : 
   forall a b, a = Id(b) -> Dup a = 0 -> Dup b = Id(0+0).
-Proof using.
+Proof.
   intros. dup 2.
   (* [unfolds] is same as [unfold in *] *)
   unfolds Dup. skip.
@@ -382,7 +382,7 @@ Definition Twice (P:Prop) := True -> P /\ P.
 
 Lemma demo_unfolds_head_definition :
   forall P:Prop, (True -> P) -> Twice P -> Twice P.
-Proof using.
+Proof.
   introv A B.
   (* [unfolds] without arguments unfolds the head definition *)
   unfolds.
@@ -397,7 +397,7 @@ Qed.
 
 Lemma demo_simpls_and_unsimpl : 
   forall a b, Dup a = (1+1) -> Dup b = Id(0+0).
-Proof using.
+Proof.
   intros.
   (* [simpls] is same as [simpl in *] *)
   simpls.
@@ -415,7 +415,7 @@ Qed.
 
 Lemma demo_substs_1 : forall a b c d e : nat, 
   a = b -> b = c -> d = e -> e = d -> P1 d -> P2 a -> P3 c.
-Proof using.
+Proof.
   introv P Q R U V. dup 2.
   (* [subst] does not work with circular equalities *)
   try subst. skip.
@@ -425,7 +425,7 @@ Qed.
 
 Lemma demo_substs_2 : forall x y (f:nat->nat), 
   x = f x -> y = x -> y = f x.
-Proof using.
+Proof.
   intros. 
   (* [subst] does not work *)
 subst.
@@ -442,7 +442,7 @@ Lemma subst_hyp_demo : forall (x y x' y' z z' : nat) (P:nat->Prop),
   (x,y,z) = (x',y',z') -> 
   P x -> P x' -> P y -> P y' -> P z -> P z' ->
   z = z'.
-Proof using.
+Proof.
   introv H. intros. 
   subst_hyp_base H. auto.
 Qed.
@@ -454,7 +454,7 @@ Qed.
 
 Lemma demo_rewrites : 
   (forall n m, m + n = n + m) -> 3 + 4 = 7.
-Proof using.
+Proof.
   introv H. dup.
   (* [rewrites] support the [rm] identity tag to remove hypothesis *)
   rewrites (rm H). skip.
@@ -464,7 +464,7 @@ Qed.
 
 Lemma demo_rewrites_at : forall x y z, 
   x = y + y -> x + x = z -> z + z = x + x + x + x.
-Proof using.
+Proof.
   introv E H. dup.
   (* [rewrite] rewrites in all similar occurences *)
   rewrite E. skip.
@@ -478,7 +478,7 @@ Qed.
 Lemma demo_rewrite_all : 
   (forall n, n + 0 = 0 + n) ->
   (3 + 0) + 0 = 5 + 0.
-Proof using.
+Proof.
   intros E.
   (* [rewrite_all] is same as [repeat rewrite] *)
   rewrite_all E. skip.
@@ -486,7 +486,7 @@ Qed.
 
 Lemma demo_asserts_and_cuts_rewrite : forall n, 
   0 < n < 2 -> P1 1 -> P1 n.
-Proof using.
+Proof.
   introv Lt H. dup 2.
   (* [asserts_rewrite] rewrites and generates a proof obligation *)
   asserts_rewrite (n = 1). skip. skip.
@@ -495,7 +495,7 @@ Proof using.
 Qed.
 
 Lemma demo_replaces : forall a b, a = b + b -> a + a + a = 3 * a.
-Proof using.
+Proof.
   intros. dup 3.
   (* [replaces] replaces all occurences (the equality subgoal is first) *)
   replaces a with 3. skip. skip.
@@ -507,7 +507,7 @@ Qed.
 
 Lemma demo_pi_rewrite : forall (P:Prop) (X:P->nat) (p1 p2:P),
    X p1 + X p2 = X p2 + X p1.
-Proof using. 
+Proof. 
   (* [pi_rewrite E] replaces any proposition [E] with an evar 
      of the same type. This is very useful when working with
      terms that are unifiable modulo proof irrelevance *)
@@ -526,7 +526,7 @@ Inductive even_shift : nat -> nat -> Prop :=
 
 Lemma demo_invert : 
   even_shift 4 8 -> False.
-Proof using.
+Proof.
   intros P. dup 12.
   (* [inversion] generates a lot of ugly stuff *)
   inversion P. inversion H7. inversion H10.
@@ -573,7 +573,7 @@ Inductive behave : nat -> Behave -> Prop :=
 Lemma demo_dependent_invert : 
   behave 4 (Behave_intro (fun x:nat => x) (fun x:nat => x <> 3))
   -> False.
-Proof using.
+Proof.
   intros H. dup 3.
   (* [inversion] can generate some dependently-typed equalities *)
   inversion H. (* look at H9 and H10 *) skip.
@@ -585,7 +585,7 @@ Qed.
 
 Lemma demo_inject_and_injects : forall a b c,
   (a,b,c) = (1,2,3) -> b = 2.
-Proof using.
+Proof.
   introv EQ. dup 5.
   (* [injection] generates some equalities in the goal *)
   injection EQ. skip.
@@ -606,7 +606,7 @@ Qed.
 Lemma demo_case_if : forall b c :bool, 
   (if b then true else true) = false ->
   (if c then true else true) = true.
-Proof using.
+Proof.
   intros. dup 4.
   case_if. auto. auto.
   case_if as P. auto. auto.
@@ -620,7 +620,7 @@ Qed.
 Lemma demo_fequals_1 : forall a b c d,
   b = d -> d = 2 -> a = 1 ->
   (a,b,c) = (1,2,3).
-Proof using.
+Proof.
   intros. dup 3.
   (* [f_equal] is not really clever on tuples *)
   f_equal. f_equal. skip. skip. skip.
@@ -634,7 +634,7 @@ Qed.
 Lemma demo_fequals_2 : forall f a b c d,
   b = d -> d = 2 -> a = 1 ->
   f a b c = f 1 2 3 :> nat.
-Proof using.
+Proof.
   intros. dup 2.
   (* [fequal] and [fequals] also work for functions, of course *)
   fequal. skip. skip. skip.
@@ -645,7 +645,7 @@ Qed.
 
 Lemma demo_fequal_post : 
   forall (P:Prop) (X:P->nat) (p1 p2:P), X p1 = X p2.
-Proof using. intros. fequals. Qed.
+Proof. intros. fequals. Qed.
 
 
 (* ********************************************************************** *)
@@ -659,7 +659,7 @@ Inductive natequal : nat -> nat -> Prop :=
 
 Lemma demo_inductions : forall n m p, 
   natequal (n + m) (m + p) -> p = n.
-Proof using.
+Proof.
   intros. dup.
   (* [induction] does not work -- too weak hypotheses *) 
   induction H. skip. skip.
@@ -669,7 +669,7 @@ Qed.
 
 Lemma demo_inductions' : forall n m, 
   natequal (n + m) 0 -> n = 0.
-Proof using.
+Proof.
   intros. dup. 
   (* same *)
   induction H. skip. skip.
@@ -687,7 +687,7 @@ Definition test_split_2 := H4 /\ H5 /\ H6 /\ test_split_1.
 Definition test_split_3 := test_split_2.
 
 Lemma demo_splits : test_split_3.
-Proof using.
+Proof.
   dup 5. 
   (* spliting a bunch of conjunction is a pain *)
   split. skip. split. skip. split. skip. split. skip. skip.
@@ -703,7 +703,7 @@ Qed.
 
 Lemma demo_branch : 
   1 = 2 \/ 2 = 3 \/ 3 = 4 \/ 4 = 4 \/ 4 = 5 \/ 5 = 6.
-Proof using.
+Proof.
   dup 6. 
   (* [branch K of N] is used to select a branch of a disjunction *)
   branch 1 of 6. skip.
@@ -717,7 +717,7 @@ Qed.
 
 Lemma demo_destructs :
   1 = 2 /\ (2 = 3 /\ 3 = 4) /\ 4 = 5 -> True.
-Proof using.
+Proof.
   intros H. destructs H. skip.
 Qed. 
 
@@ -728,7 +728,7 @@ Qed.
 Parameter lemma_hide : forall n, n + 0 = n.
 
 Lemma demo_hide_hyps : forall x:nat, x + 0 = x.
-Proof using.
+Proof.
   intros.
   (* Any term has the type [Something] *)
   generalize (lemma_hide : Something). intros H.
@@ -747,7 +747,7 @@ Qed.
 
 Lemma demo_hide_def : forall x:nat, 
    let y := x + x in let z := y in y + 0 = y.
-Proof using.
+Proof.
   intros.
   (* [hide_def x] hides the body of a definition *)
   hide_def y.
@@ -767,7 +767,7 @@ Qed.
 
 Lemma demo_hide_generic : forall x:nat, 
    let y := x + x + x + x in let z := y in y + 0 = y.
-Proof using.
+Proof.
 (* NEWCOQ_BUG
   intros.
   generalize (lemma_hide). intros H.
@@ -792,7 +792,7 @@ Qed.
 
 Lemma demo_hide_term : forall x,
   x + x + x = 3.
-Proof using.
+Proof.
   intros.
   (* using [hide_term E] and [show_term] *)
   hide_term (x+x+x).
@@ -807,7 +807,7 @@ Lemma demo_clears : forall (x y z : nat) (A B : Prop),
   (x <> y) -> 
   (A <-> B) ->
   True.
-Proof using.
+Proof.
   introv z Pos Neq Iff. dup 5.
   (* [clears] is like [clear] except it clears all dependencies *)
   clears y. skip.
@@ -831,7 +831,7 @@ Lemma demo_sort :
   forall p,
   K (m+p) ->
   True.
-Proof using.
+Proof.
   intros.
   (* [sort] puts all the proposition at the bottom of the context *)
   sort. skip.
@@ -843,7 +843,7 @@ Qed.
 
 Lemma demo_skip : forall n m p : nat,
   n > m -> m >= p -> n > p.
-Proof using.
+Proof.
   intros. dup 6. 
   (* [skip H: E] is used to accept a new fact *)
   skip R1: (m = m). skip.
@@ -861,7 +861,7 @@ Qed.
 
 (* DEPRECATED
 Lemma demo_skip_with_existential : False.
-Proof using.
+Proof.
   dup.
   (* [skip'] is the alternative implementation of [skip],
      which forbits [Qed] to be written at the end of the proof *)
@@ -894,7 +894,7 @@ Lemma demo_lets_of : forall (x y : nat) (A B : Prop),
    K (m+p) -> 
    True) ->
   True.
-Proof using.
+Proof.
   introv Pos Neq Iff L M.
   (* [lets] is used to instantiate a lemma [M] on arguments *)
 
@@ -924,7 +924,7 @@ Qed.
 Lemma demo_forwards_1 : forall x : nat, x > 1 ->
   (forall z, z > 1 -> exists y, z < 2 /\ z <> y) -> 
   True.
-Proof using.
+Proof.
   introv Le H. dup 4.
   (* [forwards] is used to instantiate a lemma entirely, generating one
      subgoal for each hypothesis and one existential variable for 
@@ -941,7 +941,7 @@ Qed.
 Lemma demo_forwards_2 : 
   (forall x y : nat, x = y -> x <= y) ->
   forall a b : nat, a <= a.
-Proof using.
+Proof.
   intros. dup. (* some more examples *)
     forwards K: (H a). reflexivity. apply K.
     forwards* K: (H a).
@@ -959,7 +959,7 @@ Lemma demo_applys_specializes : forall (x y : nat) (A B : Prop),
    m <> n -> 
    True) ->
   True.
-Proof using.
+Proof.
   introv Pos Neq Iff M. dup 17.
   (* [applys] is used to apply an instantiated lemma. *)
   applys (>> M Pos). eauto. eauto.
@@ -992,7 +992,7 @@ Definition mydef := forall (n m : nat), n = m -> False.
 
 Lemma demo_specializes_definition :
   forall (i:nat), mydef -> i <> i.
-Proof using.
+Proof.
   introv H. dup 6. 
   (** specializes one by one *)
   specializes H i. specializes H i.
@@ -1015,7 +1015,7 @@ Definition outerdef := mydef.
 
 Lemma demo_specializes_definition_2 : 
   forall (i:nat), outerdef -> i <> i.
-Proof using.
+Proof.
   introv H. dup 6.
   (** specializes one by one *)
   specializes H i. specializes H i.
@@ -1039,7 +1039,7 @@ Definition nesteddef := forall (n:nat), mydef.
 
 Lemma demo_specializes_definition_3 : 
   forall (i:nat), nesteddef -> outerdef.
-Proof using.
+Proof.
   intros i H. dup 4.
   (** forwards does not instantiate [mydef] from [H] *)
   forwards K: H i. skip.
@@ -1074,7 +1074,7 @@ Admitted. (* demo *)
 
 Lemma demo_equates_non_dep : forall (P:nat->nat->nat->Prop) x y z,
   P x y z.
-Proof using.
+Proof.
   intros. dup 6.
   equates 1. skip. skip.
   equates 2. skip. skip.
@@ -1086,7 +1086,7 @@ Admitted. (* demo *)
 
 Lemma demo_equates_dep : forall (P:nat->forall A, A->Prop) x (T:Type) z,
   P x T z.
-Proof using.
+Proof.
   intros. dup 4.
   equates 1. skip. skip.
   (* replacement of dependent hypotheses is not allowed *)
@@ -1144,18 +1144,18 @@ Hint Constructors bigred bigredh.
 
 Lemma bigredh_lt : forall n n' t v,
   bigredh n t v -> (n < n')%nat -> bigredh n' t v.
-Proof using.
+Proof.
   introv H. gen n'. induction H; introv L; 
    (destruct n' as [|n']; [ false; omega | autos* ]).
 Qed.
 
 Lemma bigredh_bigred : forall n t v, (* optional *)
   bigredh n t v -> bigred t v.
-Proof using. introv H. induction* H. Qed.
+Proof. introv H. induction* H. Qed.
 
 Lemma bigred_bigredh : forall t v,
   bigred t v -> exists n, bigredh n t v.
-Proof using. hint bigredh_lt. introv H. induction H; try induct_height. Qed.
+Proof. hint bigredh_lt. introv H. induction H; try induct_height. Qed.
 
 (** After exploiting this last lemma, it is possible to perform an 
     induction on the height of a derivation by doing [induction n]. *)
@@ -1169,7 +1169,7 @@ End IndHeight.
 
 Lemma demo_exist : 
   exists x1 x2 x3, x1 = x2 /\ x2 = x3 /\ x3 = 0.
-Proof using. 
+Proof. 
   (* dup N makes N copies of the current goal, which is useful for demos *)
   dup 7.
   (* N-ary existentials are displayed in a packed way, 
@@ -1195,7 +1195,7 @@ Admitted.
 
 Definition let_binding_test_1 :
   ('let x := 3 in 'let y := x + x in y + y) = 12.
-Proof using.
+Proof.
   dup 3.
   (* One can compute with ['let] *)
   reflexivity.
@@ -1212,7 +1212,7 @@ Qed.
 
 Definition let_binding_test_2 :
   ('let x := 3 in 'let y := x + x in y + y) = 12 -> True.
-Proof using.
+Proof.
   dup 2; intros H.
   (* One can inline ['let] step by step *)
   simpl in H. (* does nothing *)

@@ -27,11 +27,11 @@ Parameter has_edge_nodes : forall A (g : graph A) x y w,
 
 Lemma has_edge_in_nodes_l : forall A (g : graph A) x y w,
   has_edge g x y w -> x \in nodes g.
-Proof using. intros. forwards*: has_edge_nodes. Qed.
+Proof. intros. forwards*: has_edge_nodes. Qed.
 
 Lemma has_edge_in_nodes_r : forall A (g : graph A) x y w,
   has_edge g x y w -> y \in nodes g.
-Proof using. intros. forwards*: has_edge_nodes. Qed.
+Proof. intros. forwards*: has_edge_nodes. Qed.
 
 Definition nonneg_edges (g:graph int) :=
   forall x y w, has_edge g x y w -> w >= 0.
@@ -52,15 +52,15 @@ Inductive is_path A (g:graph A) : int -> int -> path A -> Prop :=
 
 Lemma is_path_in_nodes_l : forall A (g:graph A) x y p,
   is_path g x y p -> x \in nodes g.
-Proof using. introv H. induction~ H. Qed.
+Proof. introv H. induction~ H. Qed.
 
 Lemma is_path_in_nodes_r : forall A (g:graph A) x y p,
   is_path g x y p -> y \in nodes g.
-Proof using. introv H. inverts~ H. apply* has_edge_in_nodes_r. Qed. 
+Proof. introv H. inverts~ H. apply* has_edge_in_nodes_r. Qed. 
 
 Lemma is_path_cons_has_edge : forall A (g:graph A) x y z w p,
   is_path g x z ((y,z,w)::p) -> has_edge g y z w.
-Proof using. introv H. inverts~ H. Qed.
+Proof. introv H. inverts~ H. Qed.
 
 (*-----------------------------------------------------------*)
 
@@ -69,11 +69,11 @@ Definition weight (p:path int) :=
 
 Lemma weight_nil : 
   weight (nil : path int) = 0.
-Proof using. auto. Qed.
+Proof. auto. Qed.
 
 Lemma weight_cons : forall (p:path int) x y w, 
   weight ((x,y,w)::p) = w + weight p.
-Proof using. intros. unfold weight. rew_list~. Qed.
+Proof. intros. unfold weight. rew_list~. Qed.
 
 (** A graph with nonnegative edges has only paths
     of nonnegative weight *)
@@ -81,7 +81,7 @@ Proof using. intros. unfold weight. rew_list~. Qed.
 Lemma nonneg_edges_to_path : forall g, 
   nonneg_edges g -> forall x y,
   value_nonneg weight (is_path g x y).
-Proof using.
+Proof.
   introv NG H. induction H. 
   rewrite weight_nil. math. 
   rewrite weight_cons. forwards: NG H0. math.

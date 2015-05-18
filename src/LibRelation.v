@@ -17,17 +17,17 @@ Definition binary (A : Type) := A -> A -> Prop.
 (** ** Inhabited *)
 
 Instance binary_inhab : forall A, Inhab (binary A).
-Proof using. intros. apply (prove_Inhab (fun _ _ => True)). Qed.
+Proof. intros. apply (prove_Inhab (fun _ _ => True)). Qed.
 
 (* ---------------------------------------------------------------------- *)
 (** ** Extensionality *)
 
 Lemma binary_extensional : forall A (R1 R2:binary A),
   (forall x y, R1 x y <-> R2 x y) -> R1 = R2.
-Proof using. intros_all. apply~ prop_ext_2. Qed.
+Proof. intros_all. apply~ prop_ext_2. Qed.
 
 Instance binary_extensional_inst : forall A, Extensional (binary A).
-Proof using. intros. apply (Build_Extensional _ (@binary_extensional A)). Defined.
+Proof. intros. apply (Build_Extensional _ (@binary_extensional A)). Defined.
 
 
 (* ---------------------------------------------------------------------- *)
@@ -79,11 +79,11 @@ Definition incl R1 R2 :=
 (* TODO already called binary_extensional above? *)
 Lemma rel_eq_intro : forall R1 R2,
   (forall x y, R1 x y <-> R2 x y) -> R1 = R2.
-Proof using. intros. extens*. Qed.
+Proof. intros. extens*. Qed.
 
 Lemma rel_eq_elim : forall R1 R2,
   R1 = R2 -> (forall x y, R1 x y <-> R2 x y).
-Proof using. intros. subst*. Qed.
+Proof. intros. subst*. Qed.
 
 End Properties.
 
@@ -203,38 +203,38 @@ Implicit Types x y z : A.
 
 Lemma refl_elim : forall x y R,
   refl R -> x = y -> R x y.
-Proof using. intros_all. subst~. Qed.
+Proof. intros_all. subst~. Qed.
 
 Lemma sym_elim : forall x y R,
   sym R -> R x y -> R y x.
-Proof using. introv Sy R1. apply* Sy. Qed.
+Proof. introv Sy R1. apply* Sy. Qed.
 
 Lemma antisym_elim : forall x y R,
   antisym R -> R x y -> R y x -> x <> y -> False.
-Proof using. intros_all*. Qed.
+Proof. intros_all*. Qed.
 
 Lemma irrefl_neq : forall R,
   irrefl R -> 
   forall x y, R x y -> x <> y. 
-Proof using. introv H P E. subst. apply* H. Qed.
+Proof. introv H P E. subst. apply* H. Qed.
 
 Lemma irrefl_elim : forall R,
   irrefl R -> 
   forall x, R x x -> False. 
-Proof using. introv H P. apply* H. Qed.
+Proof. introv H P. apply* H. Qed.
 
 Lemma sym_to_eq : forall R,
   sym R -> 
   forall x y, R x y = R y x.
-Proof using. introv H. intros. apply prop_ext. split; apply H. Qed.
+Proof. introv H. intros. apply prop_ext. split; apply H. Qed.
 
 Lemma sym_flip : forall R,
   sym R -> flip R = R.
-Proof using. intros. unfold flip. apply* prop_ext_2. Qed.
+Proof. intros. unfold flip. apply* prop_ext_2. Qed.
 
 Lemma trans_strict : forall R,
   trans R -> antisym R -> trans (strict R).
-Proof using. 
+Proof. 
   introv T S. unfold strict. introv [H1 H2] [H3 H4]. split. 
     apply* T.
     intros K. subst. apply H2. apply~ S.
@@ -242,56 +242,56 @@ Qed.
 
 Lemma flip_flip : forall R, 
   flip (flip R) = R.
-Proof using. intros. apply* prop_ext_2. Qed.
+Proof. intros. apply* prop_ext_2. Qed.
 
 Lemma flip_refl : forall R,
   refl R -> refl (flip R).
-Proof using. intros_all. unfolds flip. auto. Qed.
+Proof. intros_all. unfolds flip. auto. Qed.
 
 Lemma flip_trans : forall R,
   trans R -> trans (flip R).
-Proof using. intros_all. unfolds flip. eauto. Qed.
+Proof. intros_all. unfolds flip. eauto. Qed.
 
 Lemma flip_antisym : forall R,
   antisym R -> antisym (flip R).
-Proof using. intros_all. unfolds flip. auto. Qed.
+Proof. intros_all. unfolds flip. auto. Qed.
 
 Lemma flip_asym : forall R,
   asym R -> asym (flip R).
-Proof using. intros_all. unfolds flip. apply* H. Qed.
+Proof. intros_all. unfolds flip. apply* H. Qed.
 
 Lemma flip_total : forall R,
   total R -> total (flip R).
-Proof using. intros_all. unfolds flip. auto. Qed.
+Proof. intros_all. unfolds flip. auto. Qed.
 
 Lemma flip_strict : forall R,
   flip (strict R) = strict (flip R).
-Proof using. intros. unfold flip, strict. apply* prop_ext_2. Qed.
+Proof. intros. unfold flip, strict. apply* prop_ext_2. Qed.
 
 Lemma flip_large : forall R,
   flip (large R) = large (flip R).
-Proof using. intros. unfold flip, large. apply* prop_ext_2. Qed.
+Proof. intros. unfold flip, large. apply* prop_ext_2. Qed.
 
 Lemma large_refl : forall R,
   refl (large R).
-Proof using. unfold large. intros_all~. Qed.
+Proof. unfold large. intros_all~. Qed.
 
 Lemma large_trans : forall R,
   trans R -> trans (large R).
-Proof using. unfold large. introv Tr [H1|E1] [H2|E2]; subst*. Qed.
+Proof. unfold large. introv Tr [H1|E1] [H2|E2]; subst*. Qed.
 
 Lemma large_antisym : forall R,
   antisym R -> antisym (large R).
-Proof using. introv T. introv H1 H2. (* todo: bug introv *)
+Proof. introv T. introv H1 H2. (* todo: bug introv *)
   unfolds large. destruct H1; destruct H2; auto. Qed.
 
 Lemma large_total : forall R,
   total R -> total (large R).
-Proof using. unfold large. intros_all~. destruct* (H x y). Qed.
+Proof. unfold large. intros_all~. destruct* (H x y). Qed.
 
 Lemma strict_large : forall R,
   irrefl R -> strict (large R) = R.
-Proof using.
+Proof.
   intros. unfold large, strict. apply prop_ext_2.
   intros_all. split; intros K.
   autos*.
@@ -300,7 +300,7 @@ Qed.
 
 Lemma large_strict : forall R,
   refl R -> large (strict R) = R.
-Proof using. 
+Proof. 
   intros. unfold large, strict. apply prop_ext_2. 
   intros_all. split; intros K.
   destruct K. autos*. subst*.
@@ -310,51 +310,51 @@ Qed.
 
 Lemma double_incl : forall R1 R2,
   incl R1 R2 -> incl R2 R1 -> R1 = R2.
-Proof using. unfolds incl. intros. apply* prop_ext_2. Qed. 
+Proof. unfolds incl. intros. apply* prop_ext_2. Qed. 
 
 Lemma rel_incl_trans : forall R1 R2 R3,
   incl R1 R2 -> incl R2 R3 -> incl R1 R3.
-Proof using.
+Proof.
   unfold incl. eauto.
 Qed.
 
 Lemma flip_injective : injective (@flip A).
-Proof using.
+Proof.
   intros R1 R2 E. apply prop_ext_2. intros x y.
   unfolds flip. rewrite* (func_same_2 y x E).
 Qed.
 
 Lemma eq_by_flip_l : forall R1 R2,
   R1 = flip R2 -> flip R1 = R2.
-Proof using. intros. apply flip_injective. rewrite~ flip_flip. Qed.
+Proof. intros. apply flip_injective. rewrite~ flip_flip. Qed.
 
 Lemma eq_by_flip_r : forall R1 R2,
   flip R1 = R2 -> R1 = flip R2.
-Proof using. intros. apply flip_injective. rewrite~ flip_flip. Qed.
+Proof. intros. apply flip_injective. rewrite~ flip_flip. Qed.
 
 (* TODO: do we really need this extensional version? *)
 
 Lemma flip_flip_applied : forall R x y, 
   (flip (flip R)) x y = R x y.
-Proof using. auto. Qed.
+Proof. auto. Qed.
 
 End ConstructionsProp.
 
 Lemma trans_elim : forall A (y x z : A) R,
   trans R -> R x y -> R y z -> R x z.
-Proof using. introv Tr R1 R2. apply* Tr. Qed.
+Proof. introv Tr R1 R2. apply* Tr. Qed.
 
 Lemma trans_sym : forall A (y x z : A) R,
   trans R -> sym R -> R z y -> R y x -> R x z.
-Proof using. introv Tr Sy R1 R2. apply* Tr. Qed.
+Proof. introv Tr Sy R1 R2. apply* Tr. Qed.
 
 Lemma trans_sym_1 : forall A (y x z : A) R,
   trans R -> sym R -> R y x -> R y z -> R x z.
-Proof using. introv Tr Sy R1 R2. apply* Tr. Qed.
+Proof. introv Tr Sy R1 R2. apply* Tr. Qed.
 
 Lemma trans_sym_2 : forall A (y x z : A) R,
   trans R -> sym R -> R x y -> R z y -> R x z.
-Proof using. introv Tr Sy R1 R2. apply* Tr. Qed.
+Proof. introv Tr Sy R1 R2. apply* Tr. Qed.
 
 Implicit Arguments trans_elim [A x z R].
 Implicit Arguments trans_sym [A x z R].
@@ -365,11 +365,11 @@ Implicit Arguments trans_sym_2 [A x z R].
 
 Lemma large_strict_trans : forall A y x z (R:binary A),
   trans R -> large R x y -> R y z -> R x z.
-Proof using. introv T [E|H] H'; subst*. Qed.
+Proof. introv T [E|H] H'; subst*. Qed.
 
 Lemma strict_large_trans : forall A y x z (R:binary A),
   trans R -> R x y -> large R y z -> R x z.
-Proof using. introv T H [E|H']; subst*. Qed.
+Proof. introv T H [E|H']; subst*. Qed.
 
 (* ---------------------------------------------------------------------- *)
 (** ** Properties about [functional] *)
@@ -380,7 +380,7 @@ Proof using. introv T H [E|H']; subst*. Qed.
 Lemma functional_characterization : forall A (R : binary A),
   functional R <->
   incl (sequence (flip R) R) eq.
-Proof using.
+Proof.
   unfold functional, incl, sequence, flip.
   split.
     introv ? [ ? [ ? ? ]]. eauto.
@@ -391,7 +391,7 @@ Qed.
 
 Lemma functional_empty : forall A,
   functional (@empty A).
-Proof using.
+Proof.
   unfold empty. repeat intro. tauto.
 Qed.
 
@@ -408,14 +408,14 @@ Qed.
 Lemma prove_rel_union_left : forall A (R1 R2 : binary A) x y,
   R1 x y ->
   union R1 R2 x y.
-Proof using.
+Proof.
   unfold union. eauto.
 Qed.
 
 Lemma prove_rel_union_right : forall A (R1 R2 : binary A) x y,
   R2 x y ->
   union R1 R2 x y.
-Proof using.
+Proof.
   unfold union. eauto.
 Qed.
 
@@ -423,14 +423,14 @@ Lemma union_covariant : forall A (R1 R2 S1 S2 : binary A),
   incl R1 S1 ->
   incl R2 S2 ->
   incl (union R1 R2) (union S1 S2).
-Proof using.
+Proof.
   unfold incl, union. intuition eauto.
 Qed.
 
 Lemma union_refl_left : forall A (R S : binary A),
   refl R ->
   refl (union R S).
-Proof using.
+Proof.
   unfold refl, union. eauto.
 Qed.
 
@@ -443,14 +443,14 @@ Qed.
 
 (* TODO there is something by the same name in [LibBag]. *)
 Lemma incl_refl : forall A (R:binary A), incl R R.
-Proof using. unfolds incl. auto. Qed.
+Proof. unfolds incl. auto. Qed.
 
 Hint Resolve incl_refl. 
 
 Lemma lexico2_incl : forall A1 A2
  (R1 R1':binary A1) (R2 R2':binary A2),
   incl R1 R1' -> incl R2 R2' -> incl (lexico2 R1 R2) (lexico2 R1' R2').
-Proof using. 
+Proof. 
   introv I1 I2. intros [x1 x2] [y1 y2] [H1|[H1 H2]].
   left~. subst. right~.
 Qed.
@@ -465,7 +465,7 @@ Lemma defined_incl_functional:
   functional S ->
   incl R S ->
   R = S.
-Proof using.
+Proof.
   introv hdef hfun hincl. eapply binary_extensional. intros v w. split; intros H; eauto.
   forwards [ w' M1 ]: hdef v.
   forwards M2: hincl. eauto.
@@ -486,7 +486,7 @@ Lemma incl_fr_functional:
   incl_fr f R ->
   functional R ->
   incl_rf R f.
-Proof using.
+Proof.
   introv h1 h2. intros a b H. forwards M: h1 a. forwards*: h2 H M.
 Qed.
 
@@ -504,47 +504,47 @@ Variables (R1:binary A1) (R2:binary A2) (R3:binary A3) (R4:binary A4).
 Lemma lexico2_app_1 : forall x1 x2 y1 y2,
   R1 x1 y1 -> 
   lexico2 R1 R2 (x1,x2) (y1,y2).
-Proof using. intros. left~. Qed.
+Proof. intros. left~. Qed.
 
 Lemma lexico2_app_2 : forall x1 x2 y1 y2,
   x1 = y1 -> R2 x2 y2 -> 
   lexico2 R1 R2 (x1,x2) (y1,y2).
-Proof using. intros. right~. Qed.
+Proof. intros. right~. Qed.
 
 Lemma lexico3_app_1 : forall x1 x2 x3 y1 y2 y3,
   R1 x1 y1 -> 
   lexico3 R1 R2 R3 (x1,x2,x3) (y1,y2,y3).
-Proof using. intros. left. left~. Qed.
+Proof. intros. left. left~. Qed.
 
 Lemma lexico3_app_2 : forall x1 x2 x3 y1 y2 y3,
   x1 = y1 -> R2 x2 y2 -> 
   lexico3 R1 R2 R3 (x1,x2,x3) (y1,y2,y3).
-Proof using. intro. left. right~. Qed.
+Proof. intro. left. right~. Qed.
 
 Lemma lexico3_app_3 : forall x1 x2 x3 y1 y2 y3,
   x1 = y1 -> x2 = y2 -> R3 x3 y3 -> 
   lexico3 R1 R2 R3 (x1,x2,x3) (y1,y2,y3).
-Proof using. intros. right~. Qed.
+Proof. intros. right~. Qed.
 
 Lemma lexico4_app_1 : forall x1 x2 x3 x4 y1 y2 y3 y4,
   R1 x1 y1 -> 
   lexico4 R1 R2 R3 R4 (x1,x2,x3,x4) (y1,y2,y3,y4).
-Proof using. intros. left. left. left~. Qed.
+Proof. intros. left. left. left~. Qed.
 
 Lemma lexico4_app_2 : forall x1 x2 x3 x4 y1 y2 y3 y4,
   x1 = y1 -> R2 x2 y2 -> 
   lexico4 R1 R2 R3 R4 (x1,x2,x3,x4) (y1,y2,y3,y4).
-Proof using. intros. left. left. right~. Qed.
+Proof. intros. left. left. right~. Qed.
 
 Lemma lexico4_app_3 : forall x1 x2 x3 x4 y1 y2 y3 y4,
   x1 = y1 -> x2 = y2 -> R3 x3 y3 -> 
   lexico4 R1 R2 R3 R4 (x1,x2,x3,x4) (y1,y2,y3,y4).
-Proof using. intros. left. right~. Qed.
+Proof. intros. left. right~. Qed.
 
 Lemma lexico4_app_4 : forall x1 x2 x3 x4 y1 y2 y3 y4,
   x1 = y1 -> x2 = y2 -> x3 = y3 -> R4 x4 y4 -> 
   lexico4 R1 R2 R3 R4 (x1,x2,x3,x4) (y1,y2,y3,y4).
-Proof using. intros. right~. Qed.
+Proof. intros. right~. Qed.
 
 End LexicoApp.
 
@@ -553,7 +553,7 @@ End LexicoApp.
 Lemma lexico2_trans : forall A1 A2 
  (R1:binary A1) (R2:binary A2),
   trans R1 -> trans R2 -> trans (lexico2 R1 R2).
-Proof using.
+Proof.
   introv Tr1 Tr2. intros [x1 x2] [y1 y2] [z1 z2] Rxy Ryz.
   simpls. destruct Rxy as [L1|[Eq1 L1]]; 
    destruct Ryz as [M2|[Eq2 M2]]; subst*.
@@ -562,14 +562,14 @@ Qed.
 Lemma lexico3_trans : forall A1 A2 A3 
  (R1:binary A1) (R2:binary A2) (R3:binary A3),
   trans R1 -> trans R2 -> trans R3 -> trans (lexico3 R1 R2 R3).
-Proof using.
+Proof.
   introv Tr1 Tr2 Tr3. applys~ lexico2_trans. applys~ lexico2_trans.
 Qed.
 
 Lemma lexico4_trans : forall A1 A2 A3 A4 
  (R1:binary A1) (R2:binary A2) (R3:binary A3) (R4:binary A4),
   trans R1 -> trans R2 -> trans R3 -> trans R4 -> trans (lexico4 R1 R2 R3 R4).
-Proof using.
+Proof.
   introv Tr1 Tr2 Tr3. applys~ lexico3_trans. applys~ lexico2_trans.
 Qed.
 
@@ -586,7 +586,7 @@ Record equiv A (R:binary A) :=
 (** Equality is an equivalence *)
 
 Lemma eq_equiv : forall A, equiv (@eq A).
-Proof using. intros. constructor; intros_all; subst~. Qed.
+Proof. intros. constructor; intros_all; subst~. Qed.
 
 Hint Resolve eq_equiv.
 
@@ -594,20 +594,20 @@ Hint Resolve eq_equiv.
 
 Lemma flip_equiv : forall A (E:binary A),
   equiv E -> equiv (flip E).
-Proof using.
+Proof.
   introv Equi. unfold flip. constructor; intros_all; 
-    dintuition eauto.
+    intuition eauto.
 Qed.
 
 (** Product of two equivalences is an equivalence *)
 
 Lemma prod2_equiv : forall A1 A2 (E1:binary A1) (E2:binary A2),
   equiv E1 -> equiv E2 -> equiv (prod2 E1 E2).
-Proof using.
+Proof.
   introv Equi1 Equi2. constructor.
-  intros [x1 x2]. simpl. dintuition.
-  intros [x1 x2] [y1 y2]. simpl. dintuition.
-  intros [x1 x2] [y1 y2] [z1 z2]. simpl. dintuition eauto.
+  intros [x1 x2]. simpl. intuition.
+  intros [x1 x2] [y1 y2]. simpl. intuition.
+  intros [x1 x2] [y1 y2] [z1 z2]. simpl. intuition eauto.
 Qed.
 (* NEWCOQ: clean above *)
 
@@ -666,53 +666,53 @@ Hint Constructors tclosure rtclosure equiv.
 
 Lemma rtclosure_once : forall x y,
   R x y -> rtclosure x y.
-Proof using. autos*. Qed.
+Proof. autos*. Qed.
 
 Hint Resolve rtclosure_once.
 
 Lemma rtclosure_trans : trans rtclosure.  
-Proof using. introv R1 R2. induction* R1. Qed.
+Proof. introv R1 R2. induction* R1. Qed.
 
 Lemma rtclosure_last : forall y x z,
   rtclosure x y -> R y z -> rtclosure x z.
-Proof using. introv R1 R2. induction* R1. Qed.
+Proof. introv R1 R2. induction* R1. Qed.
 
 Hint Resolve rtclosure_trans.
 
 Lemma tclosure_once : forall x y,
   R x y -> tclosure x y.  
-Proof using. eauto. Qed.
+Proof. eauto. Qed.
 
 Lemma tclosure_rtclosure : forall x y,
   tclosure x y -> rtclosure x y.  
-Proof using. intros. destruct* H. Qed.
+Proof. intros. destruct* H. Qed.
 
 Hint Resolve tclosure_once tclosure_rtclosure.
 
 Lemma tclosure_rtclosure_step : forall x y z,
   rtclosure x y -> R y z -> tclosure x z.
-Proof using. intros. induction* H. Qed.
+Proof. intros. induction* H. Qed.
 
 Lemma tclosure_step_rtclosure : forall x y z,
   R x y -> rtclosure y z -> tclosure x z.
-Proof using. intros. gen x. induction* H0. Qed.
+Proof. intros. gen x. induction* H0. Qed.
 
 Lemma tclosure_step_tclosure : forall x y z,
   R x y -> tclosure y z -> tclosure x z.
-Proof using. intros. inverts* H0. Qed.
+Proof. intros. inverts* H0. Qed.
 
 Hint Resolve tclosure_rtclosure_step tclosure_step_rtclosure.
 
 Lemma tclosure_rtclosure_tclosure : forall y x z,
   rtclosure x y -> tclosure y z -> tclosure x z.  
-Proof using. intros. gen z. induction* H. Qed.
+Proof. intros. gen z. induction* H. Qed.
 
 Lemma tclosure_tclosure_rtclosure : forall y x z,
   tclosure x y -> rtclosure y z -> tclosure x z.  
-Proof using. intros. induction* H. Qed. 
+Proof. intros. induction* H. Qed. 
 
 Lemma tclosure_trans : trans tclosure.
-Proof using. intros_all. autos* tclosure_tclosure_rtclosure. Qed.
+Proof. intros_all. autos* tclosure_tclosure_rtclosure. Qed.
 
 
 (* ---------------------------------------------------------------------- *)
@@ -725,7 +725,7 @@ Lemma rtclosure_ind_trans : forall (P : A -> A -> Prop),
   (forall x y : A, R x y -> P x y) ->
   (forall y x z : A, rtclosure x y -> P x y -> rtclosure y z -> P y z -> P x z) ->
   forall x y : A, rtclosure x y -> P x y.
-Proof using.
+Proof.
   introv Hrefl Hstep Htrans S. induction S.
   auto. apply~ (@Htrans y).
 Qed.
@@ -736,7 +736,7 @@ Lemma rtclosure_ind_right : forall (P : A -> A -> Prop),
   (forall x : A, P x x) ->
   (forall y x z : A, rtclosure x y -> P x y -> R y z -> P x z) ->
   forall x y : A, rtclosure x y -> P x y.
-Proof using.
+Proof.
   introv Hrefl Hlast. apply rtclosure_ind_trans. 
   auto.
   intros. apply~ (Hlast x).
@@ -753,7 +753,7 @@ Lemma tclosure_ind_trans : forall A (R:binary A) (P : A -> A -> Prop),
   (forall x y : A, R x y -> P x y) ->
   (forall y x z : A, tclosure R x y -> P x y -> tclosure R y z -> P y z -> P x z) ->
   forall x y : A, tclosure R x y -> P x y.
-Proof using.
+Proof.
   Hint Resolve tclosure_once.
   introv Hstep Htrans S. inverts S as HR S. gen x. induction S; introv HR.
     autos*.
@@ -766,7 +766,7 @@ Hint Resolve rtclosure_refl rtclosure_step rtclosure_once : rtclosure.
 
 Lemma incl_tclosure_self : forall A (R:binary A), 
    incl R (tclosure R).
-Proof using. unfolds incl. intros. apply~ tclosure_once. Qed.
+Proof. unfolds incl. intros. apply~ tclosure_once. Qed.
 Hint Resolve incl_tclosure_self. 
 
 (* TODO: sort and complete the following *)
@@ -775,7 +775,7 @@ Hint Resolve stclosure_step stclosure_sym stclosure_trans.
 
 Lemma stclosure_le : forall A (R1 R2 : binary A),
   incl R1 R2 -> incl (stclosure R1) (stclosure R2).
-Proof using. unfolds incl. introv Le H. induction* H. Qed.
+Proof. unfolds incl. introv Le H. induction* H. Qed.
 
 
 (* ---------------------------------------------------------------------- *)
@@ -816,26 +816,26 @@ Hint Unfold sclosure : sclosure.
 Lemma rtclosure_refl_contrapositive : forall A (R : binary A) x y,
   ~ rtclosure R x y ->
   x <> y.
-Proof using.
+Proof.
   intros. intro. subst. eauto using rtclosure_refl.
 Qed.
 
 Lemma rtclosure_rstclosure : forall A (R : binary A) x y,
   rtclosure R x y -> rstclosure R x y.
-Proof using.
+Proof.
   induction 1; eauto with rstclosure.
 Qed.
 
 Lemma stclosure_rstclosure : forall A (R : binary A) x y,
   stclosure R x y -> rstclosure R x y.
-Proof using.
+Proof.
   induction 1; eauto with rstclosure.
 Qed.
 
 Lemma stclosure_is_rstclosure : forall A (R : binary A),
   refl R ->
   stclosure R = rstclosure R.
-Proof using.
+Proof.
   intros. eapply binary_extensional. intros x y.
   split; eauto using stclosure_rstclosure.
   gen x y. induction 1; eauto with stclosure.
@@ -843,34 +843,34 @@ Qed.
 
 Lemma refl_rstclosure : forall A (R : binary A),
   refl (rstclosure R).
-Proof using.
+Proof.
   unfold refl. eauto with rstclosure.
 Qed.
 
 Lemma rstclosure_covariant : forall A (R S : binary A),
   incl R S ->
   incl (rstclosure R) (rstclosure S).
-Proof using.
+Proof.
   unfold incl. induction 2; eauto with rstclosure.
 Qed.
 
 Lemma rstclosure_inflationary: forall A (R : binary A),
   incl R (rstclosure R).
-Proof using.
+Proof.
   unfold incl. eauto with rstclosure.
 Qed.
 
 Lemma prove_rstclosure_incl : forall A (R S : binary A),
   incl R (rstclosure S) ->
   incl (rstclosure R) (rstclosure S).
-Proof using.
+Proof.
   unfold incl. induction 2; eauto with rstclosure.
 Qed.
 
 Lemma rstclosure_union : forall A (R S : binary A),
   incl (union (rstclosure R) (rstclosure S))
        (rstclosure (union R S)).
-Proof using.
+Proof.
   unfold incl, union. intros ? ? ? x y H. 
   destruct H; gen x y;
   induction 1; eauto with rstclosure.
@@ -879,14 +879,14 @@ Qed.
 
 Lemma sym_sclosure : forall A (R : binary A),
   sym (sclosure R).
-Proof using.
+Proof.
   unfold sym, sclosure. tauto.
 Qed.
 
 Lemma sclosure_is_a_closure_operator : forall A (R1 R2 : binary A),
   incl R1 (sclosure R2) ->
   incl (sclosure R1) (sclosure R2).
-Proof using.
+Proof.
   unfold sclosure, incl. introv h. introv H.
   destruct H.
   { eauto. }
@@ -896,21 +896,21 @@ Qed.
 Lemma sclosure_covariant : forall A (R1 R2 : binary A),
   incl R1 R2 ->
   incl (sclosure R1) (sclosure R2).
-Proof using.
+Proof.
   unfold sclosure, incl. introv M H. destruct H; eauto.
 Qed.
 
 Lemma rtclosure_covariant : forall A (R1 R2 : binary A),
   incl R1 R2 ->
   incl (rtclosure R1) (rtclosure R2).
-Proof using.
+Proof.
   unfold incl. induction 2; eauto with rtclosure.
 Qed.
 
 Lemma tclosure_covariant : forall A (R1 R2 : binary A),
   incl R1 R2 ->
   incl (tclosure R1) (tclosure R2).
-Proof using.
+Proof.
   unfold incl. inversion 2; subst. econstructor.
   eauto.
   eapply rtclosure_covariant; eauto.
@@ -918,7 +918,7 @@ Qed.
 
 Lemma tclosure_last : forall A (R : binary A) y x z,
   tclosure R x y -> R y z -> tclosure R x z.
-Proof using.
+Proof.
   inversion 1; intros; subst.
   eauto using rtclosure_last with tclosure.
 Qed.
@@ -928,14 +928,14 @@ Qed.
 Lemma sym_rtclosure : forall A (R : binary A),
   sym R ->
   sym (rtclosure R).
-Proof using.
+Proof.
   unfold sym. induction 2; eauto using rtclosure_last with rtclosure.
 Qed.
 
 Lemma sym_tclosure : forall A (R : binary A),
   sym R ->
   sym (tclosure R).
-Proof using.
+Proof.
   unfold sym. inversion 2; subst. 
   eapply tclosure_rtclosure_step.
   eapply sym_rtclosure; eauto.
@@ -944,14 +944,14 @@ Qed.
 
 Lemma sclosure_incl_stclosure : forall A (R : binary A),
   incl (sclosure R) (stclosure R).
-Proof using.
+Proof.
   unfold incl. inversion 1; eauto with stclosure.
 Qed.
 
 Lemma tclosure_incl_stclosure : forall A (R1 R2 : binary A),
   incl R1 (stclosure R2) ->
   incl (tclosure R1) (stclosure R2).
-Proof using.
+Proof.
   introv H M. induction M using tclosure_ind_trans.
   applys* H.
   applys* stclosure_trans.
@@ -959,7 +959,7 @@ Qed.
 
 Lemma stclosure_is_tclosure_sclosure : forall A (R : binary A),
   stclosure R = tclosure (sclosure R).
-Proof using.
+Proof.
   extens. intros x y. split.
   { gen x y. induction 1.
     { eauto with tclosure sclosure rtclosure. }

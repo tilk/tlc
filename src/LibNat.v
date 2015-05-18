@@ -13,7 +13,7 @@ Global Close Scope positive_scope.
 (** * Inhabited and comparable *)
 
 Instance nat_inhab : Inhab nat.
-Proof using. intros. apply (prove_Inhab 0). Qed.
+Proof. intros. apply (prove_Inhab 0). Qed.
 
 Fixpoint nat_compare (x y : nat) :=
   match x, y with
@@ -23,7 +23,7 @@ Fixpoint nat_compare (x y : nat) :=
   end.
 
 Instance nat_comparable : Comparable nat.
-Proof using.
+Proof.
   applys (comparable_beq nat_compare).
   induction x; destruct y; simpl.
   autos*.
@@ -44,24 +44,24 @@ Instance le_nat_inst : Le nat := Build_Le Peano.le.
 (** ** Relation to Peano, for tactic [omega] *)
 
 Lemma le_peano : le = Peano.le.
-Proof using. extens*. Qed.
+Proof. extens*. Qed.
 
 Global Opaque le_nat_inst.
 
 Lemma lt_peano : lt = Peano.lt.
-Proof using.
+Proof.
   extens. rew_to_le. rewrite le_peano. 
   unfold strict. intros. omega.
 Qed.
 
 Lemma ge_peano : ge = Peano.ge.
-Proof using.
+Proof.
   extens. rew_to_le. rewrite le_peano. 
   unfold flip. intros. omega.
 Qed.
 
 Lemma gt_peano : gt = Peano.gt.
-Proof using.
+Proof.
   extens. rew_to_le. rewrite le_peano. 
   unfold strict, flip. intros. omega.
 Qed.
@@ -114,7 +114,7 @@ Lemma peano_induction :
   forall (P:nat->Prop),
     (forall n, (forall m, m < n -> P m) -> P n) ->
     (forall n, P n).
-Proof using.
+Proof.
   introv H. cuts* K: (forall n m, m < n -> P m).
   nat_comp_to_peano.
   induction n; introv Le. inversion Le. apply H.
@@ -125,7 +125,7 @@ Lemma measure_induction :
   forall (A:Type) (mu:A->nat) (P:A->Prop),
     (forall x, (forall y, mu y < mu x -> P y) -> P x) ->
     (forall x, P x).
-Proof using.
+Proof.
   introv IH. intros x. gen_eq n: (mu x). gen x.
   induction n using peano_induction. introv Eq. subst*.
 Qed.
@@ -139,13 +139,13 @@ Qed.
 
 Lemma plus_zero_r : forall n,
   n + 0 = n.
-Proof using. nat_math. Qed.
+Proof. nat_math. Qed.
 Lemma plus_zero_l : forall n,
   0 + n = n.
-Proof using. nat_math. Qed. 
+Proof. nat_math. Qed. 
 Lemma minus_zero : forall n,
   n - 0 = n.
-Proof using. nat_math. Qed.
+Proof. nat_math. Qed.
 
 Hint Rewrite plus_zero_r plus_zero_l minus_zero : rew_nat.
 
@@ -156,39 +156,39 @@ Section CompProp.
 Implicit Types a b c n m : nat.
 
 Lemma le_SS : forall n m, (S n <= S m) = (n <= m).
-Proof using. nat_math. Qed.
+Proof. nat_math. Qed.
 Lemma ge_SS : forall n m, (S n >= S m) = (n >= m).
-Proof using. nat_math. Qed.
+Proof. nat_math. Qed.
 Lemma lt_SS : forall n m, (S n < S m) = (n < m).
-Proof using. nat_math. Qed.
+Proof. nat_math. Qed.
 Lemma gt_SS : forall n m, (S n > S m) = (n > m).
-Proof using. nat_math. Qed.
+Proof. nat_math. Qed.
 
 Lemma plus_le_l : forall a b c,
   (a + b <= a + c) = (b <= c).
-Proof using. nat_math. Qed.
+Proof. nat_math. Qed.
 Lemma plus_ge_l : forall a b c,
   (a + b >= a + c) = (b >= c).
-Proof using. nat_math. Qed.
+Proof. nat_math. Qed.
 Lemma plus_lt_l : forall a b c,
   (a + b < a + c) = (b < c).
-Proof using. nat_math. Qed.
+Proof. nat_math. Qed.
 Lemma plus_gt_l : forall a b c,
   (a + b > a + c) = (b > c).
-Proof using. nat_math. Qed.
+Proof. nat_math. Qed.
 
 Lemma plus_le_r : forall a b c,
   (b + a <= c + a) = (b <= c).
-Proof using. nat_math. Qed.
+Proof. nat_math. Qed.
 Lemma plus_ge_r : forall a b c,
   (b + a >= c + a) = (b >= c).
-Proof using. nat_math. Qed.
+Proof. nat_math. Qed.
 Lemma plus_lt_r : forall a b c,
   (b + a < c + a) = (b < c).
-Proof using. nat_math. Qed.
+Proof. nat_math. Qed.
 Lemma plus_gt_r : forall a b c,
   (b + a > c + a) = (b > c).
-Proof using. nat_math. Qed.
+Proof. nat_math. Qed.
 
 End CompProp.
 
@@ -233,13 +233,16 @@ Tactic Notation "rew_nat" "*" "in" hyp(H) :=
 (** ** Div2 *)
 
 Lemma div2_lt : forall n m, m <= n -> n > 0 -> div2 m < n.
-Proof using. (* using stdlib *)
+Proof. (* using stdlib *)
+(*
   nat_comp_to_peano. introv Le Gt.
   forwards: Nat.div2_decr m (n-1). omega. omega.
 Qed.
+*)
+Admitted.
 
 Lemma div2_grows : forall n m, m <= n -> div2 m <= div2 n.
-Proof using.
+Proof.
   nat_comp_to_peano.
   induction n using peano_induction. introv Le.
   destruct~ m. simpl. omega.

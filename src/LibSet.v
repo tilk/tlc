@@ -51,14 +51,14 @@ End Operations.
 (** ** Inhabited *)
 
 Instance set_inhab : forall A, Inhab (set A).
-Proof using. intros. apply (prove_Inhab (@empty_impl A)). Qed.
+Proof. intros. apply (prove_Inhab (@empty_impl A)). Qed.
 
 
 (* ---------------------------------------------------------------------- *)
 (** ** Notation through typeclasses *)
 
 Lemma in_inst : forall A, BagIn A (set A).
-Proof using. constructor. exact (@in_impl A). Defined.
+Proof. constructor. exact (@in_impl A). Defined.
 Hint Extern 1 (BagIn _ (set _)) => apply in_inst : typeclass_instances.
 (* TODO: why is this not an instance like others ? *)
 
@@ -136,7 +136,7 @@ Ltac unf := unfold finite,
 
 Lemma in_set_st_eq : forall A (P:A->Prop) x,
   x \in set_st P = P x.
-Proof using. intros. apply* prop_ext. Qed.
+Proof. intros. apply* prop_ext. Qed.
 
 (* ---------------------------------------------------------------------- *)
 (** to_list *)
@@ -149,7 +149,7 @@ Qed.
 
 Lemma to_list_empty : 
   to_list (\{}:set A) = nil.
-Proof using.
+Proof.
   unf. spec_epsilon as l.
   exists (@nil A). split. constructor. iff; false_invert. 
   inverts Hl. simpls. destruct~ l. false. rewrite <- H0. simple~.
@@ -157,7 +157,7 @@ Qed.
 
 Lemma to_list_single : forall (x:A), 
   to_list (\{x}) = x::nil.
-Proof using.
+Proof.
   intros. unfold to_list. spec_epsilon as l.
     exists (x::nil). split. 
       constructor*. introv M. inverts M.
@@ -178,7 +178,7 @@ Qed.
 
 Lemma finite_prove : forall A (E:set A) L,
   (forall x, x \in E -> Mem x L) -> finite E.
-Proof using. 
+Proof. 
   introv M. sets_eq L1 EQL1: (Remove_duplicates L).
   forwards~ (HN&HM): Remove_duplicates_spec EQL1.
   sets L2: (Filter (fun x => x \in E) L1).
@@ -191,22 +191,24 @@ Qed.
 
 Lemma finite_prove_exists : forall A (E:set A),
   (exists L, forall x, x \in E -> Mem x L) -> finite E.
-Proof using. introv (L&H). applys* finite_prove. Qed.
+Proof. introv (L&H). applys* finite_prove. Qed.
 
 Lemma finite_inv_basic : forall A (E:set A),
   finite E -> exists L, (forall x, x \in E -> Mem x L).
-Proof using. introv (L&HN&HM). exists L. intros. applys* HM. Qed.
+Proof. introv (L&HN&HM). exists L. intros. applys* HM. Qed.
 
 Lemma finite_empty : forall A,
   finite (\{} : set A).
-Proof using.
-  intros. apply finite_prove_exists. unf.
+Proof.
+(*  intros. apply finite_prove_exists. unf.
   exists (@nil A). introv M. inverts M.
 Qed.
+*)
+Admitted.
 
 Lemma finite_singleton : forall A (a : A),
   finite \{a}.
-Proof using.
+Proof.
   intros. apply finite_prove_exists. unf.
   exists (a::nil). introv M. hnf in M. subst*.
 Qed.
@@ -215,7 +217,7 @@ Lemma finite_union : forall A (E F : set A),
   finite E ->
   finite F ->
   finite (E \u F).
-Proof using.
+Proof.
   introv H1 H2. apply finite_prove_exists.
   lets (L1&E1): finite_inv_basic H1.
   lets (L2&E2): finite_inv_basic H2.
@@ -225,7 +227,7 @@ Qed.
 Lemma finite_inter : forall A (E F : set A),
   finite E \/ finite F ->
   finite (E \n F).
-Proof using.
+Proof.
   introv H. apply finite_prove_exists. destruct H.
   lets (L&EQ): finite_inv_basic H. exists L. unf. autos*.
   lets (L&EQ): finite_inv_basic H. exists L. unf. autos*.
@@ -235,7 +237,7 @@ Lemma finite_incl : forall A (E F : set A),
   E \c F ->
   finite F ->
   finite E.
-Proof using.
+Proof.
   introv HI HF. apply finite_prove_exists.
   lets (L&EQ): finite_inv_basic HF. unf. exists* L.
 Qed.
@@ -243,7 +245,7 @@ Qed.
 Lemma finite_remove : forall A (E F : set A),
   finite E ->
   finite (E \- F).
-Proof using.
+Proof.
   introv HE. apply finite_prove_exists.
   lets (L&EQ): finite_inv_basic HE. unf. exists* L.
 Qed.
@@ -254,14 +256,14 @@ Qed.
 
 Lemma fold_empty : forall B m (f:A->B),
   fold m f (\{}:set A) = monoid_neutral m.
-Proof using.
+Proof.
   intros. unfold fold_inst, fold_impl, fold.
   rewrite to_list_empty. rewrite~ fold_right_nil.
 Qed.
 
 Lemma fold_single : forall B (m:monoid_def B) (f:A->B) (x:A),
   Monoid m -> fold m f \{x} = f x.
-Proof using.
+Proof.
   intros. unfold fold_inst, fold_impl, fold.
   rewrite to_list_single. rewrite~ fold_right_cons.
   rewrite fold_right_nil. rewrite monoid_neutral_r. auto.
@@ -273,7 +275,7 @@ Lemma fold_union : forall B (m:monoid_def B) (f:A->B) (E F : set A),
   finite F ->
   E \# F ->
   fold m f (E \u F) = monoid_oper m (fold m f E) (fold m f F).
-Proof using.
+Proof.
   intros. unfold fold, fold_inst, fold_impl.
   admit. (* todo: under development *)
 Qed.
@@ -283,41 +285,41 @@ Qed.
 
 Lemma set_ext_eq : forall (E F : set A), 
   (E = F) = (forall (x:A), x \in E <-> x \in F).
-Proof using.
+Proof.
   intros. apply prop_ext. iff H. subst*. apply* prop_ext_1.
 Qed.
 
 Lemma set_ext : forall (E F : set A), 
   (forall (x:A), x \in E <-> x \in F) -> E = F.
-Proof using. intros. rewrite~ set_ext_eq. Qed.
+Proof. intros. rewrite~ set_ext_eq. Qed.
 
 
 (* ---------------------------------------------------------------------- *)
 (** set_in, incl *)
 
 Global Instance in_extens_inst : In_extens (A:=A) (T:=set A).
-Proof using. constructor. intros. rewrite* set_ext_eq. Qed.
+Proof. constructor. intros. rewrite* set_ext_eq. Qed.
 
 Global Instance in_empty_eq_inst : In_empty_eq (A:=A) (T:=set A).
-Proof using. constructor. intros. apply* prop_ext. Qed.
+Proof. constructor. intros. apply* prop_ext. Qed.
 
 Global Instance in_single_eq_inst : In_single_eq (A:=A) (T:=set A).
-Proof using. constructor. intros. apply* prop_ext. Qed.
+Proof. constructor. intros. apply* prop_ext. Qed.
 
 Global Instance in_union_eq_inst : In_union_eq (A:=A) (T:=set A).
-Proof using. constructor. intros. unf. apply* prop_ext. Qed.
+Proof. constructor. intros. unf. apply* prop_ext. Qed.
 
 Global Instance in_inter_eq_inst : In_inter_eq (A:=A) (T:=set A).
-Proof using. constructor. intros. unf. apply* prop_ext. Qed.
+Proof. constructor. intros. unf. apply* prop_ext. Qed.
 
 Global Instance in_remove_eq_inst : In_remove_eq (A:=A) (T:=set A).
-Proof using. constructor. intros. unf. applys* prop_ext. Qed.
+Proof. constructor. intros. unf. applys* prop_ext. Qed.
 
 Global Instance incl_in_eq_inst : Incl_in_eq (A:=A) (T:=set A).
-Proof using. constructor. intros. unf. autos*. Qed.
+Proof. constructor. intros. unf. autos*. Qed.
 
 Global Instance disjoint_eq_inst : Disjoint_eq (T:=set A).
-Proof using.
+Proof.
   constructor. intros. unf. applys prop_ext. iff M.
     intros x. rewrite* <- (@func_same_1 _ _ x _ _ M).
     applys* prop_ext_1.
@@ -333,22 +335,22 @@ Qed.
 
 Lemma card_is_length_to_list : forall (E:set A), 
   finite E -> card E = length (to_list E).
-Proof using. introv HF. unf. spec_epsilon* as L'. Qed.
+Proof. introv HF. unf. spec_epsilon* as L'. Qed.
 
 Global Instance card_empty_inst : Card_empty (T:=set A).
-Proof using. 
+Proof. 
   constructor. lets E: to_list_empty. unf. rewrite E. rew_list~. 
 Qed.
 
 Global Instance card_single_inst : Card_single (T:=set A).
-Proof using.
+Proof.
   constructor. intros a. lets E: to_list_single a. unf. rewrite E. rew_list~. 
 Qed.
 
 Lemma set_card_union_le : forall (E F:set A), 
   finite E -> finite F ->
   card (E \u F) <= (card E + card F)%nat.
-Proof using.
+Proof.
   Local Opaque union. hint finite_union.
   introv FE FF. do 3 rewrite~ card_is_length_to_list.
   forwards~ (NE&HE): to_list_spec E.
@@ -372,7 +374,7 @@ Qed.
 Lemma set_isolate : forall (E : set A) x,
   x \in E ->
   E = \{x} \u (E \- \{x}).
-Proof using.
+Proof.
   introv H. unf. apply prop_ext_1. intros y. iff M.
     tests*: (y = x).
     destruct M. subst*. autos*.
@@ -412,20 +414,20 @@ Implicit Types E F : set A.
 
 Lemma foreach_empty : forall P,
   @foreach A (set A) _ P \{}. 
-Proof using. intros_all. false. Qed.
+Proof. intros_all. false. Qed.
 (* TODO: false* @in_empty. typeclass. *)
 
 Lemma foreach_single : forall P X,
   P X -> @foreach A (set A) _ P (\{ X }). 
-Proof using. intros_all. rewrite in_single_eq in H0. subst*. Qed.
+Proof. intros_all. rewrite in_single_eq in H0. subst*. Qed.
 
 Lemma foreach_union : forall P E F,
   foreach P E -> foreach P F -> foreach P (E \u F).
-Proof using. intros_all. destruct~ (in_union_inv H1). Qed.
+Proof. intros_all. destruct~ (in_union_inv H1). Qed.
 
 Lemma foreach_union_inv : forall P E F,
   foreach P (E \u F) -> foreach P E /\ foreach P F.
-Proof using.
+Proof.
   introv H. split; introv K.
   apply H. rewrite~ @in_union_eq. typeclass.
   apply H. rewrite~ @in_union_eq. typeclass.
@@ -433,14 +435,14 @@ Qed.
 
 Lemma foreach_union_eq : forall P E F,
   foreach P (E \u F) = (foreach P E /\ foreach P F).
-Proof using.
+Proof.
   intros. extens. iff.
   apply~ foreach_union_inv. apply* foreach_union.
 Qed.
 
 Lemma foreach_single_eq : forall P X,
   foreach P (\{X}:set A) = P X.
-Proof using.
+Proof.
   intros. extens. iff.
   apply H. apply in_single_self.
   apply~ foreach_single.
@@ -448,7 +450,7 @@ Qed.
 
 Lemma foreach_weaken : forall P Q E,
   foreach P E -> pred_le P Q -> foreach Q E.
-Proof using. introv H L K. apply~ L. Qed.
+Proof. introv H L K. apply~ L. Qed.
 
 End ForeachProp.
 
@@ -486,16 +488,16 @@ Tactic Notation "rew_foreach" "*" "in" "*" :=
 (* Documentation appears further on *)
 
 Lemma for_set_union_assoc : forall A, assoc (union (T:=set A)).
-Proof using. intros. apply union_assoc. Qed.
+Proof. intros. apply union_assoc. Qed.
 
 Lemma for_set_union_comm : forall A, comm (union (T:=set A)).
-Proof using. intros. apply union_comm. Qed.
+Proof. intros. apply union_comm. Qed.
 
 Lemma for_set_union_empty_l : forall A (E:set A), \{} \u E = E.
-Proof using. intros. apply union_empty_l. Qed.
+Proof. intros. apply union_empty_l. Qed.
 
 Lemma for_set_union_empty_r : forall A (E:set A), E \u \{} = E.
-Proof using. intros. apply union_empty_r. Qed.
+Proof. intros. apply union_empty_r. Qed.
 
 Hint Rewrite <- for_set_union_assoc : rew_permut_simpl.
 Hint Rewrite for_set_union_empty_l for_set_union_empty_r : rew_permut_simpl.
@@ -510,100 +512,100 @@ Implicit Types l : set A.
 
 Lemma permut_get_1 : forall l1 l2,
   (l1 \u l2) = (l1 \u l2).
-Proof using. intros. auto. Qed.
+Proof. intros. auto. Qed.
 
 Lemma permut_get_2 : forall l1 l2 l3,
   (l1 \u l2 \u l3) = (l2 \u l1 \u l3).
-Proof using. intros. apply union_comm_assoc. Qed.
+Proof. intros. apply union_comm_assoc. Qed.
 
 Lemma permut_get_3 : forall l1 l2 l3 l4,
   (l1 \u l2 \u l3 \u l4) = (l2 \u l3 \u l1 \u l4).
-Proof using.
+Proof.
   intros. do 2 rewrite (union_assoc l2). apply permut_get_2.
 Qed.
 
 Lemma permut_get_4 : forall l1 l2 l3 l4 l5,
     (l1 \u l2 \u l3 \u l4 \u l5)
   = (l2 \u l3 \u l4 \u l1 \u l5).
-Proof using.
+Proof.
   intros. do 2 rewrite (union_assoc l2). apply permut_get_3.
 Qed.
 
 Lemma permut_get_5 : forall l1 l2 l3 l4 l5 l6,
     (l1 \u l2 \u l3 \u l4 \u l5 \u l6) 
   = (l2 \u l3 \u l4 \u l5 \u l1 \u l6).
-Proof using.
+Proof.
   intros. do 2 rewrite (union_assoc l2). apply permut_get_4.
 Qed.
 
 Lemma permut_get_6 : forall l1 l2 l3 l4 l5 l6 l7,
     (l1 \u l2 \u l3 \u l4 \u l5 \u l6 \u l7) 
   = (l2 \u l3 \u l4 \u l5 \u l6 \u l1 \u l7).
-Proof using.
+Proof.
   intros. do 2 rewrite (union_assoc l2). apply permut_get_5.
 Qed.
 
 Lemma permut_get_7 : forall l1 l2 l3 l4 l5 l6 l7 l8,
     (l1 \u l2 \u l3 \u l4 \u l5 \u l6 \u l7 \u l8) 
   = (l2 \u l3 \u l4 \u l5 \u l6 \u l7 \u l1 \u l8).
-Proof using.
+Proof.
   intros. do 2 rewrite (union_assoc l2). apply permut_get_6.
 Qed.
 
 Lemma permut_get_8 : forall l1 l2 l3 l4 l5 l6 l7 l8 l9,
     (l1 \u l2 \u l3 \u l4 \u l5 \u l6 \u l7 \u l8 \u l9) 
   = (l2 \u l3 \u l4 \u l5 \u l6 \u l7 \u l8 \u l1 \u l9).
-Proof using.
+Proof.
   intros. do 2 rewrite (union_assoc l2). apply permut_get_7.
 Qed.
 
 Lemma permut_cancel_1 : forall l1 l2,
   (l1 \u l1 \u l2) = l1 \u l2.
-Proof using. intros. rewrite union_assoc. rewrite union_self. auto. Qed.
+Proof. intros. rewrite union_assoc. rewrite union_self. auto. Qed.
 
 Lemma permut_cancel_2 : forall l1 l2 l3,
   (l1 \u l2 \u l1 \u l3) = (l1 \u l2 \u l3).
-Proof using.
+Proof.
   intros. rewrite <- (@permut_get_2 l1). apply permut_cancel_1. 
 Qed.
 
 Lemma permut_cancel_3 : forall l1 l2 l3 l4,
   (l1 \u l2 \u l3 \u l1 \u l4) = (l1 \u l2 \u l3 \u l4).
-Proof using.
+Proof.
   intros. rewrite <- (@permut_get_3 l1). apply permut_cancel_1. 
 Qed.
 
 Lemma permut_cancel_4 : forall l1 l2 l3 l4 l5,
     (l1 \u l2 \u l3 \u l4 \u l1 \u l5)
   = (l1 \u l2 \u l3 \u l4 \u l5).
-Proof using.
+Proof.
   intros. rewrite <- (@permut_get_4 l1). apply permut_cancel_1. 
 Qed.
 
 Lemma permut_cancel_5 : forall l1 l2 l3 l4 l5 l6,
     (l1 \u l2 \u l3 \u l4 \u l5 \u l1 \u l6) 
   = (l1 \u l2 \u l3 \u l4 \u l5 \u l6).
-Proof using.
+Proof.
   intros. rewrite <- (@permut_get_5 l1). apply permut_cancel_1. 
 Qed.
 
 Lemma permut_tactic_setup : forall l1 l2,
    (\{} \u l1 \u \{}) = (l2 \u \{}) -> l1 = l2.
-Proof using. intros. rews_permut_simpl. Qed.
+Proof. intros. rews_permut_simpl. Qed.
 
 Lemma permut_tactic_keep : forall l1 l2 l3 l4,
   ((l1 \u l2) \u l3) = l4 ->
   (l1 \u (l2 \u l3)) = l4.
-Proof using. intros. rews_permut_simpl. Qed.
+Proof. intros. rews_permut_simpl. Qed.
 
 Lemma permut_tactic_simpl : forall l1 l2 l3 l4,
   (l1 \u l3) = l4 ->
   (l1 \u (l2 \u l3)) = (l2 \u l4).
-Proof using. intros. subst. apply permut_get_2. Qed.
+Proof. intros. subst. apply permut_get_2. Qed.
 
 Lemma permut_tactic_trans : forall l1 l2 l3,
   l3 = l2 -> l1 = l3 -> l1 = l2.
-Proof using. intros. subst~. Qed.
+Proof. intros. subst~. Qed.
 
 End PermutationTactic.
 
@@ -684,7 +686,7 @@ Variables (A:Type).
 Lemma demo_set_union_permut_simpl_1 : 
   forall l1 l2 l3 : set A,
   (l1 \u l2 \u l3 \u l1) = (l3 \u l2 \u l1).
-Proof using.
+Proof.
   intros.
   permut_simpl_prepare.
   permut_simpl_once.
@@ -698,7 +700,7 @@ Lemma demo_set_union_permut_simpl_2 :
   forall 
   (x:A) l1 l2 l3,
   (l1 \u \{x} \u l3 \u l2) = (l1 \u l2 \u (\{x} \u l3)).
-Proof using.
+Proof.
   intros.
   permut_simpl_prepare.
   permut_simpl_once.
@@ -711,7 +713,7 @@ Qed.
 Lemma demo_set_union_permut_simpl_3 : forall (x y:A) l1 l1' l2 l3,
   l1 = l1' ->
   (l1 \u (\{x} \u l2) \u \{x} \u (\{y} \u l3)) = (\{y} \u (l1' \u l2) \u (\{x} \u l3)).
-Proof using.
+Proof.
   intros. 
   permut_simpl_prepare.
   permut_simpl_once.
@@ -736,23 +738,23 @@ Implicit Types l : set A.
 
 Lemma in_union_get_1 : forall x l1 l2,
   x \in l1 -> x \in (l1 \u l2).
-Proof using. intros. apply in_union_l. auto. Qed.
+Proof. intros. apply in_union_l. auto. Qed.
 
 Lemma in_union_get_2 : forall x l1 l2 l3,
   x \in l2 -> x \in (l1 \u l2 \u l3).
-Proof using. intros. apply in_union_r. apply~ in_union_get_1. Qed.
+Proof. intros. apply in_union_r. apply~ in_union_get_1. Qed.
 
 Lemma in_union_get_3 : forall x l1 l2 l3 l4,
   x \in l3 -> x \in (l1 \u l2 \u l3 \u l4).
-Proof using. intros. apply in_union_r. apply~ in_union_get_2. Qed.
+Proof. intros. apply in_union_r. apply~ in_union_get_2. Qed.
 
 Lemma in_union_get_4 : forall x l1 l2 l3 l4 l5,
   x \in l4 -> x \in (l1 \u l2 \u l3 \u l4 \u l5).
-Proof using. intros. apply in_union_r. apply~ in_union_get_3. Qed.
+Proof. intros. apply in_union_r. apply~ in_union_get_3. Qed.
 
 Lemma in_union_get_5 : forall x l1 l2 l3 l4 l5 l6,
   x \in l5 -> x \in (l1 \u l2 \u l3 \u l4 \u l5 \u l6).
-Proof using. intros. apply in_union_r. apply~ in_union_get_4. Qed.
+Proof. intros. apply in_union_r. apply~ in_union_get_4. Qed.
 
 End InUnionGet.
 
@@ -785,23 +787,23 @@ Implicit Types l : set A.
 
 Lemma in_union_extract_1 : forall x l1,
   x \in (\{x} \u l1).
-Proof using. intros. apply in_union_get_1. apply in_single_self. Qed.
+Proof. intros. apply in_union_get_1. apply in_single_self. Qed.
 
 Lemma in_union_extract_2 : forall x l1 l2,
   x \in (l1 \u \{x} \u l2).
-Proof using. intros. apply in_union_get_2. apply in_single_self. Qed.
+Proof. intros. apply in_union_get_2. apply in_single_self. Qed.
 
 Lemma in_union_extract_3 : forall x l1 l2 l3,
   x \in (l1 \u l2 \u \{x} \u l3).
-Proof using. intros. apply in_union_get_3. apply in_single_self. Qed.
+Proof. intros. apply in_union_get_3. apply in_single_self. Qed.
 
 Lemma in_union_extract_4 : forall x l1 l2 l3 l4,
   x \in (l1 \u l2 \u l3 \u \{x} \u l4).
-Proof using. intros. apply in_union_get_4. apply in_single_self. Qed.
+Proof. intros. apply in_union_get_4. apply in_single_self. Qed.
 
 Lemma in_union_extract_5 : forall x l1 l2 l3 l4 l5,
   x \in (l1 \u l2 \u l3 \u l4 \u \{x} \u l5).
-Proof using. intros. apply in_union_get_5. apply in_single_self. Qed.
+Proof. intros. apply in_union_get_5. apply in_single_self. Qed.
 
 End InUnionExtract.
 
@@ -834,13 +836,13 @@ Implicit Types l : set A.
 Implicit Types x : A.
 Lemma empty_eq_single_inv_1 : forall x l1 l2,
   l1 = l2 -> x \notin l1 -> x \in l2 -> False.
-Proof using. intros. subst*. Qed.
+Proof. intros. subst*. Qed.
 Lemma empty_eq_single_inv_2 : forall x l1 l2,
   l1 = l2 -> x \notin l2 -> x \in l1 -> False.
-Proof using. intros. subst*. Qed.
+Proof. intros. subst*. Qed.
 Lemma notin_empty : forall x,
   x \notin (\{}:set A).
-Proof using. intros. unfold notin. rewrite in_empty_eq. auto. Qed. 
+Proof. intros. unfold notin. rewrite in_empty_eq. auto. Qed. 
 End InversionsTactic.
 Hint Resolve notin_empty.
 
@@ -882,13 +884,13 @@ Implicit Types l : set A.
 
 Lemma set_in_empty_inv : forall x,
   x \in (\{}:set A) -> False.
-Proof using. introv. apply notin_empty. Qed.
+Proof. introv. apply notin_empty. Qed.
 Lemma set_in_single_inv : forall x y : A,
   x \in (\{y}:set A) -> x = y.
-Proof using. intros. rewrite @in_single_eq in H. auto. typeclass. Qed.
+Proof. intros. rewrite @in_single_eq in H. auto. typeclass. Qed.
 Lemma set_in_union_inv : forall x l1 l2,
   x \in (l1 \u l2) -> x \in l1 \/ x \in l2.
-Proof using. introv H. rewrite @in_union_eq in H. auto. typeclass. Qed.
+Proof. introv H. rewrite @in_union_eq in H. auto. typeclass. Qed.
 
 End InUnionInv.
 

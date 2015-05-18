@@ -96,7 +96,7 @@ Lemma use_idempotent : forall i x y,
   y = i x ->
   i y = y.
   (* Expanded statement, for easier use by [eauto]. *)
-Proof using.
+Proof.
   intros. subst. eauto.
 Qed.
 
@@ -179,15 +179,15 @@ Implicit Types h : oper1 A.
 
 Lemma neutral_r_from_comm_neutral_l : forall f e, 
   comm f -> neutral_l f e -> neutral_r f e.
-Proof using. introv C N. intros_all. rewrite* C. Qed.
+Proof. introv C N. intros_all. rewrite* C. Qed.
 
 Lemma inverse_r_from_comm_inverse_l : forall f e i, 
   comm f -> inverse_l f e i -> inverse_r f e i.
-Proof using. introv C I. intros_all. rewrite* C. Qed. 
+Proof. introv C I. intros_all. rewrite* C. Qed. 
 
 Lemma distrib_r_from_comm_distrib_l : forall f g, 
   comm f -> distrib_l f g -> distrib_r f g.
-Proof using.
+Proof.
   introv C N. intros_all. unfolds distrib_l.
   do 3 rewrite <- (C x). auto.
 Qed.  
@@ -196,7 +196,7 @@ Qed.
 
 Lemma comm_assoc_prove : forall f,
   comm f -> assoc f -> comm_assoc f.
-Proof using.
+Proof.
   introv C S. intros_all. rewrite C. 
   rewrite <- S. rewrite~ (C x).
 Qed.

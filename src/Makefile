@@ -9,6 +9,7 @@
 # Compilation
 
 all: proof
+SERIOUS:=1
 COQINCLUDE := -R . TLC
 include Makefile.coq
 

@@ -274,7 +274,7 @@ Notation "'Register' D T" := (ltac_database (boxer D) (boxer T) _)
 
 Lemma ltac_database_provide : forall (A:Boxer) (D:Boxer) (T:Boxer),
   ltac_database D T A.
-Proof using. split. Qed.
+Proof. split. Qed.
 
 Ltac Provide T := apply (@ltac_database_provide (boxer T)).
 
@@ -410,7 +410,7 @@ Tactic Notation "show" tactic(tac) :=
     [dup] is short for [dup 2]. *)
 
 Lemma dup_lemma : forall P, P -> P -> P.
-Proof using. auto. Qed.
+Proof. auto. Qed.
 
 Ltac dup_tactic N :=
   match nat_from_number N with
@@ -604,7 +604,7 @@ Ltac jauto_set :=
 (** ** Application *)
 
 Ltac old_refine f := 
-  refine f; shelve_unifiable.
+  refine f. (*; shelve_unifiable. *)
 
 (** [rapply] is a tactic similar to [eapply] except that it is
     based on the [refine] tactics, and thus is strictly more 
@@ -1426,38 +1426,38 @@ Variables (A6 : forall (x1 : A1) (x2 : A2 x1) (x3 : A3 x2) (x4 : A4 x3) (x5 : A5
 
 Lemma equates_0 : forall (P Q:Prop),
   P -> P = Q -> Q.
-Proof using. intros. subst. auto. Qed.
+Proof. intros. subst. auto. Qed.
 
 Lemma equates_1 : 
   forall (P:A0->Prop) x1 y1,
   P y1 -> x1 = y1 -> P x1.
-Proof using. intros. subst. auto. Qed.
+Proof. intros. subst. auto. Qed.
 
 Lemma equates_2 : 
   forall y1 (P:A0->forall(x1:A1),Prop) x1 x2,
   P y1 x2 -> x1 = y1 -> P x1 x2.
-Proof using. intros. subst. auto. Qed.
+Proof. intros. subst. auto. Qed.
 
 Lemma equates_3 : 
   forall y1 (P:A0->forall(x1:A1)(x2:A2 x1),Prop) x1 x2 x3,
   P y1 x2 x3 -> x1 = y1 -> P x1 x2 x3.
-Proof using. intros. subst. auto. Qed.
+Proof. intros. subst. auto. Qed.
 
 Lemma equates_4 :
   forall y1 (P:A0->forall(x1:A1)(x2:A2 x1)(x3:A3 x2),Prop) x1 x2 x3 x4,
   P y1 x2 x3 x4 -> x1 = y1 -> P x1 x2 x3 x4.
-Proof using. intros. subst. auto. Qed.
+Proof. intros. subst. auto. Qed.
 
 Lemma equates_5 :
   forall y1 (P:A0->forall(x1:A1)(x2:A2 x1)(x3:A3 x2)(x4:A4 x3),Prop) x1 x2 x3 x4 x5,
   P y1 x2 x3 x4 x5 -> x1 = y1 -> P x1 x2 x3 x4 x5.
-Proof using. intros. subst. auto. Qed.
+Proof. intros. subst. auto. Qed.
 
 Lemma equates_6 :
   forall y1 (P:A0->forall(x1:A1)(x2:A2 x1)(x3:A3 x2)(x4:A4 x3)(x5:A5 x4),Prop) 
   x1 x2 x3 x4 x5 x6,
   P y1 x2 x3 x4 x5 x6 -> x1 = y1 -> P x1 x2 x3 x4 x5 x6.
-Proof using. intros. subst. auto. Qed.
+Proof. intros. subst. auto. Qed.
 
 End equatesLemma.
 
@@ -2458,7 +2458,7 @@ Tactic Notation "invert" hyp(H) "as" simple_intropattern(I1)
 
 Axiom inj_pair2 : forall (U : Type) (P : U -> Type) (p : U) (x y : P p),
        existT P p x = existT P p y -> x = y.
-(* Proof using. apply Eqdep.EqdepTheory.inj_pair2. Qed.*)
+(* Proof. apply Eqdep.EqdepTheory.inj_pair2. Qed.*)
 
 Ltac inverts_tactic H i1 i2 i3 i4 i5 i6 :=
   let rec go i1 i2 i3 i4 i5 i6 :=
@@ -2968,7 +2968,7 @@ Require Import Compare_dec Omega.
 
 Lemma induct_height_max2 : forall n1 n2 : nat,
   exists n, n1 < n /\ n2 < n.
-Proof using.
+Proof.
   intros. destruct (lt_dec n1 n2).
   exists (S n2). omega.
   exists (S n1). omega.
@@ -3041,7 +3041,7 @@ Tactic Notation "decides_equality" :=
 
 Lemma iff_intro_swap : forall (P Q : Prop), 
   (Q -> P) -> (P -> Q) -> (P <-> Q).
-Proof using. intuition. Qed.
+Proof. intuition. Qed.
 
 Tactic Notation "iff" simple_intropattern(H1) simple_intropattern(H2) :=
   split; [ intros H1 | intros H2 ].
@@ -3503,7 +3503,7 @@ Tactic Notation "auto_false" "*" :=
    auto_false_base ltac:(fun tt => auto_star).
 
 Tactic Notation "dauto" :=
-  dintuition eauto.
+  intuition eauto.
 
 
 
@@ -4284,15 +4284,15 @@ Notation "'Something'" :=
 
 Lemma ltac_something_eq : forall (e:Type),
   e = (@ltac_something _ e).
-Proof using. auto. Qed.
+Proof. auto. Qed.
 
 Lemma ltac_something_hide : forall (e:Type),
   e -> (@ltac_something _ e).
-Proof using. auto. Qed.
+Proof. auto. Qed.
 
 Lemma ltac_something_show : forall (e:Type),
   (@ltac_something _ e) -> e.
-Proof using. auto. Qed.
+Proof. auto. Qed.
 
 (** [hide_def x] and [show_def x] can be used to hide/show 
     the body of the definition [x]. *)
@@ -4501,7 +4501,7 @@ Tactic Notation "clears_but" ident(H1) ident(H2) ident(H3) ident(H4) ident(H5) :
 
 Lemma demo_clears_all_and_clears_but : 
   forall x y:nat, y < 2 -> x = x -> x >= 2 -> x < 3 -> True.
-Proof using.
+Proof.
   introv M1 M2 M3. dup 6.
   (* [clears_all] clears all hypotheses. *)
   clears_all. auto.
@@ -4669,7 +4669,7 @@ Tactic Notation "skip_rewrite_all" constr(T) :=
     default), and call [destruct E] instead of [induction E]. 
     It is useful to try and set up a proof by induction
     first, and fix the applications of the induction hypotheses
-    during a second pass on the Proof using.  *)
+    during a second pass on the Proof.  *)
 (* TODO: deprecated *)
 
 Tactic Notation "skip_induction" constr(E) :=
@@ -4788,7 +4788,7 @@ Global Open Scope let_scope.
 
 Lemma let_binding_unfold : forall (A B:Type) (v:A) (K:A->B),
   let_binding v K = K v.
-Proof using. reflexivity. Qed.
+Proof. reflexivity. Qed.
 
 Ltac let_get_fresh_binding_name K :=
   match K with (fun x => _) => let y := fresh x in y end.
@@ -4904,27 +4904,27 @@ Variables (A1 A2 A3 A4 A5 B : Type).
 Lemma func_eq_1 : forall (f:A1->B) x1 y1,
   x1 = y1 -> 
   f x1 = f y1.
-Proof using. intros. subst~. Qed.
+Proof. intros. subst~. Qed.
 
 Lemma func_eq_2 : forall (f:A1->A2->B) x1 y1 x2 y2,
   x1 = y1 -> x2 = y2 -> 
   f x1 x2 = f y1 y2.
-Proof using. intros. subst~. Qed.
+Proof. intros. subst~. Qed.
 
 Lemma func_eq_3 : forall (f:A1->A2->A3->B) x1 y1 x2 y2 x3 y3,
   x1 = y1 -> x2 = y2 -> x3 = y3 -> 
   f x1 x2 x3 = f y1 y2 y3.
-Proof using. intros. subst~. Qed.
+Proof. intros. subst~. Qed.
 
 Lemma func_eq_4 : forall (f:A1->A2->A3->A4->B) x1 y1 x2 y2 x3 y3 x4 y4,
   x1 = y1 -> x2 = y2 -> x3 = y3 -> x4 = y4 -> 
   f x1 x2 x3 x4 = f y1 y2 y3 y4.
-Proof using. intros. subst~. Qed.
+Proof. intros. subst~. Qed.
 
 Lemma func_eq_5 : forall (f:A1->A2->A3->A4->A5->B) x1 y1 x2 y2 x3 y3 x4 y4 x5 y5,
   x1 = y1 -> x2 = y2 -> x3 = y3 -> x4 = y4 -> x5 = y5 -> 
   f x1 x2 x3 x4 x5 = f y1 y2 y3 y4 y5.
-Proof using. intros. subst~. Qed.
+Proof. intros. subst~. Qed.
 
 End FuncEq.
 

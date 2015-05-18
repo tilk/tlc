@@ -41,7 +41,7 @@ Open Scope Int_scope.
 Definition my_Z_of_nat := Z_of_nat.
 
 Lemma my_Z_of_nat_def : my_Z_of_nat = Z_of_nat.
-Proof using. reflexivity. Qed.
+Proof. reflexivity. Qed.
 
 Global Opaque my_Z_of_nat.
 
@@ -71,7 +71,7 @@ Ltac nat_from_number N ::=
 (** * Inhabited *)
 
 Instance int_inhab : Inhab int.
-Proof using. intros. apply (prove_Inhab 0). Qed.
+Proof. intros. apply (prove_Inhab 0). Qed.
 
 
 (* ********************************************************************** *)
@@ -97,7 +97,7 @@ Global Instance comparison_comparable : Comparable comparison.
 Qed.
 
 Global Instance int_comparable : Comparable int.
-Proof using.
+Proof.
   applys comparable_beq (fun i j => decide (i ?= j = Eq)). intros x y.
   simpl; rew_refl; iff H; rewrite Z.compare_eq_iff in * |- *; inverts~ H.
 Qed.
@@ -113,24 +113,24 @@ Instance le_int_inst : Le int := Build_Le Zle.
 (** ** Relation to Peano, for tactic [omega] *)
 
 Lemma le_zarith : le = Zle.
-Proof using. extens*. Qed.
+Proof. extens*. Qed.
 
 Global Opaque le_int_inst.
 
 Lemma lt_zarith : lt = Zlt.
-Proof using.
+Proof.
   extens. rew_to_le. rewrite le_zarith.
   unfold strict. intros. omega.
 Qed.
 
 Lemma ge_zarith : ge = Zge.
-Proof using.
+Proof.
   extens. rew_to_le. rewrite le_zarith. 
   unfold flip. intros. omega.
 Qed.
 
 Lemma gt_zarith : gt = Zgt.
-Proof using.
+Proof.
   extens. rew_to_le. rewrite le_zarith. 
   unfold strict, flip. intros. omega.
 Qed.
@@ -221,15 +221,15 @@ Ltac split_if_eq_bool :=
 
 Lemma Z_of_nat_O : 
   Z_of_nat O = 0.
-Proof using. reflexivity. Qed.
+Proof. reflexivity. Qed.
 
 Lemma Z_of_nat_S : forall n, 
   Z_of_nat (S n) = Zsucc (Z_of_nat n).
-Proof using. intros. rewrite~ <- Zpos_P_of_succ_nat. Qed.
+Proof. intros. rewrite~ <- Zpos_P_of_succ_nat. Qed.
 
 Lemma Z_of_nat_plus1 : forall n, 
   Z_of_nat (1 + n) = Zsucc (Z_of_nat n).
-Proof using. intros. rewrite <- Z_of_nat_S. fequals~. Qed.
+Proof. intros. rewrite <- Z_of_nat_S. fequals~. Qed.
 
 (** [rew_maths] rewrite any lemma in the base [rew_maths].
     The goal should not contain any evar, otherwise tactic might loop. *)
@@ -254,7 +254,7 @@ Ltac math_setup_goal :=
 (* todo; [int_nat_conv] 
 Lemma int_nat_plus : forall (n m:nat),
   (n + m)%nat = (n + m)%Z :> int.
-Proof using. applys inj_plus. Qed.
+Proof. applys inj_plus. Qed.
 Hint Rewrite int_nat_plus : int_nat_conv.
 *)
 
@@ -381,42 +381,42 @@ Hint Extern 3 (@gt int _ _ _) => math : maths.
 
 Lemma plus_zero_r : forall n,
   n + 0 = n.
-Proof using. math. Qed.
+Proof. math. Qed.
 Lemma plus_zero_l : forall n,
   0 + n = n.
-Proof using. math. Qed.
+Proof. math. Qed.
 Lemma minus_zero : forall n,
   n - 0 = n.
-Proof using. math. Qed.
+Proof. math. Qed.
 
 (* ---------------------------------------------------------------------- *)
 (** ** Comparison *)
 
 Lemma plus_le_l : forall a b c,
   (a + b <= a + c) = (b <= c).
-Proof using. math. Qed.
+Proof. math. Qed.
 Lemma plus_ge_l : forall a b c,
   (a + b >= a + c) = (b >= c).
-Proof using. math. Qed.
+Proof. math. Qed.
 Lemma plus_lt_l : forall a b c,
   (a + b < a + c) = (b < c).
-Proof using. math. Qed.
+Proof. math. Qed.
 Lemma plus_gt_l : forall a b c,
   (a + b > a + c) = (b > c).
-Proof using. math. Qed.
+Proof. math. Qed.
 
 Lemma plus_le_r : forall a b c,
   (b + a <= c + a) = (b <= c).
-Proof using. math. Qed.
+Proof. math. Qed.
 Lemma plus_ge_r : forall a b c,
   (b + a >= c + a) = (b >= c).
-Proof using. math. Qed.
+Proof. math. Qed.
 Lemma plus_lt_r : forall a b c,
   (b + a < c + a) = (b < c).
-Proof using. math. Qed.
+Proof. math. Qed.
 Lemma plus_gt_r : forall a b c,
   (b + a > c + a) = (b > c).
-Proof using. math. Qed.
+Proof. math. Qed.
 
 (* ---------------------------------------------------------------------- *)
 (** ** Simplification tactic *)
@@ -460,11 +460,11 @@ Global Opaque Zabs Zabs_nat.
 
 Lemma abs_pos_nat : forall n : nat,
   abs n = n.
-Proof using. exact Zabs_nat_Z_of_nat. Qed.
+Proof. exact Zabs_nat_Z_of_nat. Qed.
 
 Lemma abs_pos : forall n : int,
   n >= 0 -> abs n = n :> int.
-Proof using. 
+Proof. 
   intros. rewrite inj_Zabs_nat.
   rewrite Zabs_eq. math. math.
 Qed.
@@ -473,27 +473,27 @@ Qed.
 
 Lemma eq_int_nat : forall n m : nat,
   n = m :> int -> n = m :> nat.
-Proof using. math. Qed.
+Proof. math. Qed.
 
 Lemma nat_int_lt : forall (x y:nat),
   (x:int) < (y:int) -> (x < y)%nat.
-Proof using. math. Qed.
+Proof. math. Qed.
 
 Lemma nat_int_neq : forall (x y:nat),
   (x:int) <> (y:int) -> (x <> y)%nat.
-Proof using. math. Qed.
+Proof. math. Qed.
 
 
 Lemma succ_abs : forall n : int,
   n >= 0 -> S (abs n) = abs (1 + n) :> nat.
-Proof using.
+Proof.
   intros n. pattern n. applys (@measure_induction _ abs). clear n.
   intros n IH Pos. rewrite <- Zabs_nat_Zsucc. fequals. math. math. 
 Qed.
 
 Lemma abs_spos : forall n : int,
   n > 0 -> abs n = S (abs (n-1)) :> nat.
-Proof using.
+Proof.
   intros. apply eq_int_nat.
   rewrite abs_pos; try math.
   rewrite succ_abs; try math.
@@ -502,35 +502,35 @@ Qed.
 
 Lemma int_nat_eq : forall (x y:nat),
   (x = y :> int) -> (x = y :> nat).
-Proof using. math. Qed.
+Proof. math. Qed.
 
 Lemma int_nat_le : forall (x y:nat),
   ((x:int) <= (y:int)) -> x <= y.
-Proof using. math. Qed.
+Proof. math. Qed.
 
 Lemma int_nat_lt : forall (x y:nat),
   x < y -> (x:int) < (y:int).
-Proof using. math. Qed.
+Proof. math. Qed.
 
 Lemma Zabs_nat_lt : forall n m, 
   (0 <= n) -> (n < m) -> (abs n < abs m).
-Proof using.
+Proof.
   intros. nat_comp_to_peano. apply Zabs_nat_lt. math.
 Qed.
 
 Lemma abs_plus : forall a b : int,
   (a >= 0) -> (b >= 0) -> 
   abs (a+b) = (abs a + abs b)%nat :> nat.
-Proof using. intros. applys Zabs2Nat.inj_add; math. Qed.
+Proof. intros. applys Zabs2Nat.inj_add; math. Qed.
 
 Lemma abs_minus : forall a b : int,
   (a >= b) -> (b >= 0) -> 
   abs (a-b) = (abs a - abs b)%nat :> nat.
-Proof using. intros. applys Zabs2Nat.inj_sub; math. Qed.
+Proof. intros. applys Zabs2Nat.inj_sub; math. Qed.
 
 Lemma plus_nat_int : forall a b : nat,
   (a+b)%nat = (a:int) + (b:int) :> int.
-Proof using. 
+Proof. 
   Transparent my_Z_of_nat.
   intros. unfold my_Z_of_nat. applys Nat2Z.inj_add.
 Qed.
@@ -538,7 +538,7 @@ Qed.
 Hint Rewrite plus_nat_int : rew_maths.
 
 Lemma abs_1 : abs 1 = 1%nat :> nat.
-Proof using. reflexivity. Qed.
+Proof. reflexivity. Qed.
 
 Hint Rewrite abs_plus abs_1 abs_pos abs_pos_nat : rew_abs_pos.
 Tactic Notation "rew_abs_pos" :=
@@ -548,44 +548,44 @@ Tactic Notation "rew_abs_pos" "~" :=
 
 Lemma mod_eq_prove : forall k a b n,
   a = b + k * n -> a mod n = b mod n.
-Proof using. intros. subst. rewrite~ Z_mod_plus_full. Qed.
+Proof. intros. subst. rewrite~ Z_mod_plus_full. Qed.
 
 Lemma mod_prove : forall k a b n,
   a = b + k * n -> 0 <= b -> b < n -> a mod n = b.
-Proof using.
+Proof.
   intros. rewrite <- (@Zmod_small b n).
   apply* mod_eq_prove. math.
 Qed.
 
 Lemma mod2_zero : 
   0 mod 2 = 0.
-Proof using. reflexivity. Qed.
+Proof. reflexivity. Qed.
 Lemma mod2_odd : forall k,
   (2 * k) mod 2 = 0.
-Proof using. intros. apply (mod_prove k); math. Qed.
+Proof. intros. apply (mod_prove k); math. Qed.
 Lemma mod2_even : forall k,
   (2 * k + 1) mod 2 = 1.
-Proof using. intros. apply (mod_prove k); math. Qed.
+Proof. intros. apply (mod_prove k); math. Qed.
 Lemma div2_odd : forall k,
   (2 * k) / 2 = k.
-Proof using.
+Proof.
   intros. math_rewrite (2*k=k*2). 
   apply Z_div_mult_full. math. 
 Qed.
 Lemma div2_even : forall k,
   k >= 0 -> (2 * k + 1) / 2 = k.
-Proof using. intros. symmetry. eapply Zdiv_unique with (r:=1); math. Qed.
+Proof. intros. symmetry. eapply Zdiv_unique with (r:=1); math. Qed.
 
 Lemma mod2_bound : forall n,
   0 <= n mod 2 < 2.
-Proof using. (* using stdlib *)
+Proof. (* using stdlib *)
   intros. forwards: (Z_mod_remainder n 2). math.
   destruct H as [[? ?]|[? ?]]; math.
 Qed.
 
 Lemma div2_bounds : forall m n,
   m = n / 2 -> 2 * m <= n /\ n <= 2 * m + 1.
-Proof using. (* using stdlib *)
+Proof. (* using stdlib *)
   intros. lets K: (Z_div_mod_eq n 2) __. math. (* TODO: forwards shouldn't do simpl *)
   rewrite <- H in K.
   lets [E1 E2]: (mod2_bound n). math.
@@ -603,13 +603,13 @@ Ltac rew_parity :=
 (* * Elimination of multiplication, to call omega *)
 
 Lemma double : forall x, 2 * x = x + x. 
-Proof using. intros. ring. Qed.
+Proof. intros. ring. Qed.
 
 Lemma triple : forall x, 3 * x = x + x + x. 
-Proof using. intros. ring. Qed.
+Proof. intros. ring. Qed.
 
 Lemma quadruple : forall x, 3 * x = x + x + x. 
-Proof using. intros. ring. Qed.
+Proof. intros. ring. Qed.
 
 (* To use [math] with simple multiplications, add the command:  
    Hint Rewrite double triple : rew_maths.
@@ -622,7 +622,7 @@ Proof using. intros. ring. Qed.
 Require Import LibEpsilon.
 
 Instance int_le_total_order : Le_total_order (A:=int).
-Proof using.
+Proof.
   constructor. constructor. constructor; unfolds.
   math. math. unfolds. math. unfolds. 
   intros. tests: (x <= y). left~. right. math.
@@ -638,30 +638,30 @@ Definition min x y :=
 
 Lemma min_self : forall x,
   min x x = x.
-Proof using. intros. unfolds min. case_if~. Qed.
+Proof. intros. unfolds min. case_if~. Qed.
 Lemma min_left : forall x y,
   x <= y -> min x y = x.
-Proof using. intros. unfolds min. case_if~. false*. Qed.
+Proof. intros. unfolds min. case_if~. false*. Qed.
 Lemma min_right : forall x y,
   y <= x -> min x y = y.
-Proof using. intros. unfolds min. case_if~. apply~ le_antisym. Qed.
+Proof. intros. unfolds min. case_if~. apply~ le_antisym. Qed.
 Lemma min_trans_elim : forall a b x y : int,
   min a b <= x -> y < a -> y < b -> y < x.
-Proof using. intros. unfolds min. case_if; math. Qed.
+Proof. intros. unfolds min. case_if; math. Qed.
 
 End Min.
 
 Require Import Zpow_facts.
 
 Lemma pow2_pos : forall n, n >= 0 -> 2^n >= 1. 
-Proof using.
+Proof.
   intros. math_rewrite (1 = 2^0). reflexivity. 
   rewrite ge_is_flip_le. unfolds. 
   apply Zpower_le_monotone; math.
 Qed.
 
 Lemma pow2_succ : forall n, n >= 0 -> 2^(n+1) = 2*2^n.
-Proof using.
+Proof.
   intros. math_rewrite (n+1 = Zsucc n).
   rewrite Zpower_Zsucc; math. 
 Qed.
@@ -681,19 +681,19 @@ Lemma eq_lt_induction : forall (P : (nat->Prop) -> Prop),
   (forall n, (forall m, n > m -> P (eq m)) -> P (lt n)) ->
   (forall n, P (lt n) -> P (eq n)) ->
   (forall n, P (eq n)).
-Proof using. intros. induction n using peano_induction. auto. Qed. 
+Proof. intros. induction n using peano_induction. auto. Qed. 
 
 Lemma eq_gt_induction : forall (P : (nat->Prop) -> Prop),
   (forall n, (forall m, n > m -> P (eq m)) -> P (gt n)) ->
   (forall n, P (gt n) -> P (eq n)) ->
   (forall n, P (eq n)).
-Proof using. intros. induction n using peano_induction. auto. Qed. 
+Proof. intros. induction n using peano_induction. auto. Qed. 
 
 Lemma eq_gt_induction_2 : forall (P1 P2 : (nat->Prop) -> Prop),
   eq_gt_implies P1 -> eq_gt_implies P2 ->
   (forall n, P1 (gt n) -> P2 (gt n) -> P1 (eq n) /\ P2 (eq n)) ->
   (forall n, P1 (eq n)) /\ (forall n, P2 (eq n)).
-Proof using.
+Proof.
   introv H1 H2 R.
   cuts M: (forall n, P1 (eq n) /\ P2 (eq n)).
     split; intros n; specializes M n; autos*.
@@ -711,7 +711,7 @@ Lemma eq_gt_induction_5 : forall (P1 P2 P3 P4 P5 : (nat->Prop) -> Prop),
     P1 (eq n) /\ P2 (eq n) /\ P3 (eq n) /\ P4 (eq n) /\ P5 (eq n)) ->
   (forall n, P1 (eq n)) /\ (forall n, P2 (eq n)) /\ (forall n, P3 (eq n))
     /\ (forall n, P4 (eq n))  /\ (forall n, P5 (eq n)).
-Proof using. 
+Proof. 
   introv H1 H2 H3 H4 H5 R.
   cuts M: (forall n, P1 (eq n) /\ P2 (eq n) /\ P3 (eq n) /\ P4 (eq n) /\ P5 (eq n)).
     splits; intros n; specializes M n; autos*.

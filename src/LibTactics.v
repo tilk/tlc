@@ -3845,6 +3845,8 @@ Tactic Notation "decides_equality" "~" :=
 
 Tactic Notation "iff" "~" :=
   iff; auto_tilde.
+Tactic Notation "iff" "~" simple_intropattern(H) :=
+  iff H; auto_tilde.
 Tactic Notation "splits" "~" :=
   splits; auto_tilde.
 Tactic Notation "splits" "~" constr(N) := 
@@ -4226,6 +4228,8 @@ Tactic Notation "decides_equality" "*" :=
 
 Tactic Notation "iff" "*" :=
   iff; auto_star.
+Tactic Notation "iff" "*" simple_intropattern(H) :=
+  iff H; auto_star.
 Tactic Notation "splits" "*" :=
   splits; auto_star.
 Tactic Notation "splits" "*" constr(N) := 

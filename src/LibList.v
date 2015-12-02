@@ -361,7 +361,7 @@ End LengthProperties.
 (** ** Rev *)
 
 Section OperationProperties.
-Variable A B : Type.
+Variable A : Type.
 Implicit Types x : A.
 Implicit Types l : list A.
 
@@ -491,6 +491,7 @@ Qed.
 (** ** Map *)
 
 Section MapProp.
+Variable B : Type.
 Variable f : A -> B.
 Lemma map_nil : 
   map f nil = nil.

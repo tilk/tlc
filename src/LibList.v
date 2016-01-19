@@ -1774,7 +1774,7 @@ Lemma Forall2_weaken : forall A B (P Q : A -> B -> Prop) la lb,
   Forall2 Q la lb.
 Proof. introv F W. induction F; constructors~. Qed.
 
-Lemma Forall2_iff_forall_Nth : forall A B (P : A -> B -> Prop) la lb,
+Lemma Forall2_iff_forall_Nth : forall A B (P : A -> B -> Prop) la lb, (* TODO: Rename into [Forall2_forall_Nth]. *)
   Forall2 P la lb -> forall n a b,
     Nth n la a ->
     Nth n lb b ->
@@ -2091,6 +2091,14 @@ Proof.
     iff E. constructors*. inverts* E.
 Qed.
 
+Lemma Mem_mem : forall A l (a:A),
+  Mem a l = mem a l.
+Proof.
+  introv. extens. induction l; iff I; inverts I as I;
+    simpls; fold_bool; rew_refl in *; autos*.
+   inverts* I.
+Qed.
+
 End MemFacts.
 
 
@@ -2221,6 +2229,20 @@ Proof.
    forwards~: IHL L''. introv N. tests: (x = a). subst L''. applys* Filter_Mem.
    math.  
 Qed.
+
+Lemma No_duplicates_Nth : forall A (L : list A) n1 n2 a,
+  No_duplicates L ->
+  Nth n1 L a ->
+  Nth n2 L a ->
+  n1 = n2.
+Proof.
+  introv NL. gen n1 n2. induction NL; introv N1 N2.
+   inverts N1.
+   inverts N1 as N1; inverts N2 as N2; autos~.
+    apply Nth_mem in N2. rewrite <- Mem_mem in N2. false*.
+    apply Nth_mem in N1. rewrite <- Mem_mem in N1. false*.
+Qed.
+
 
 (* ---------------------------------------------------------------------- *)
 (* ** Update of a functional list *)

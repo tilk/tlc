@@ -188,6 +188,14 @@ Proof. tautob~. Qed.
 Lemma neg_neg : involutive neg.
 Proof. tautob~. Qed.
 
+Lemma distribute_and : forall x y z,
+  (x || y) && z = x && z || y && z.
+Proof. tautob~. Qed.
+
+Lemma distribute_or : forall x y z,
+  x && y || z = (x || z) && (y || z).
+Proof. tautob~. Qed.
+
 
 (* ---------------------------------------------------------------------- *)
 (** ** Properties of [if then else] *)

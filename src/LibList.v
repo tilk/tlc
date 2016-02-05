@@ -2258,6 +2258,18 @@ Proof.
     auto.
 Qed.
 
+Lemma filter_No_duplicates : forall (L:list A) p,
+  No_duplicates L -> No_duplicates (filter p L).
+Proof.
+  Hint Constructors No_duplicates.
+  introv H. induction H.
+  rewrite* filter_nil.
+  rewrite filter_cons. case_if.
+    constructors*. introv N. rewrite Mem_mem in N. rewrite filter_mem_eq in N.
+     rew_refl in N. rewrite* <- Mem_mem in N.
+    auto.
+Qed.
+
 End FilterFacts.
 
 (* ---------------------------------------------------------------------- *)

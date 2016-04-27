@@ -884,6 +884,44 @@ End Facts.
 End TakeInt.
 Export TakeInt.
 
+
+(* ---------------------------------------------------------------------- *)
+(** ** Remove *)
+
+Section RemoveProperties.
+Variables (A:Type) (CA:Comparable A).
+Implicit Types x y : A.
+Implicit Types l : list A.
+
+Lemma remove_mem : forall l x y,
+  mem x (remove y l) = mem x l &&& decide (x <> y).
+Proof using. unfold remove. introv. rewrite~ filter_mem_eq. Qed.
+
+Lemma removes_mem : forall l L x,
+  mem x (removes L l) = mem x l &&& ! mem x L.
+Proof using.
+  introv. extens. rew_refl. gen l. induction L; simpls~.
+   iff*.
+   rew_refl. iff M.
+    apply IHL in M. forwards~ (M'&NM): (rm M).
+     rewrite remove_mem in M'. rew_refl in M'. forwards (M&D): (rm M'). splits~. rew_logic~.
+    lets (M'&NM): (rm M). apply IHL. splits~. rewrite remove_mem. rew_refl*.
+Qed.
+
+Lemma remove_id : forall l x,
+  ~ mem x l ->
+  l = remove x l.
+Proof.
+  introv M. induction~ l.
+  unfolds. rewrite filter_cons. cases_if.
+   rewrite IHl at 1; autos~.
+    introv M'. apply M. simpl. rew_refl. right~.
+   false M. simpl. fold_bool. rew_refl in *. rewrite not_not in *. left~.
+Qed.
+
+End RemoveProperties.
+
+
 (* ---------------------------------------------------------------------- *)
 (** ** TakeDropLast *)
 

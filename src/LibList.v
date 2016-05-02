@@ -728,6 +728,28 @@ Qed.
 
 End FilterProp.
 
+
+(* ---------------------------------------------------------------------- *)
+(** ** Exists_st *)
+
+Section ExistsStProp.
+Variable p : predb A.
+
+Lemma app_exists_st : forall l1 l2,
+  exists_st p (l1 ++ l2) = exists_st p l1 || exists_st p l2.
+Proof using.
+  intros. unfold exists_st. rewrite fold_right_app.
+  asserts H: (forall i,
+    fold_right (fun x acc => acc || p x) i l1
+    = i || fold_right (fun x acc => acc || p x) false l1).
+  induction l1; introv.
+   simpl. extens. rew_refl*.
+   simpl. rewrite IHl1. extens. rew_refl*.
+  rewrite H. extens. rew_refl*.
+Qed.
+
+End ExistsStProp.
+
 (* ---------------------------------------------------------------------- *)
 (** ** Drop *)
 
@@ -1286,14 +1308,8 @@ Proof using.
 Qed.
 
 Lemma app_mem_assoc : forall A B (l1 l2 : list (A * B)) a,
-  mem_assoc a (l1 ++ l2) ->
-  mem_assoc a l1 \/ mem_assoc a l2.
-Proof using.
-  introv M. lets (b&M'): mem_assoc_exists_mem (rm M). rewrite mem_app in M'.
-  rew_refl in M'. inverts M' as M.
-   left. apply* mem_mem_assoc.
-   right. apply* mem_mem_assoc.
-Qed.
+  mem_assoc a (l1 ++ l2) = mem_assoc a l1 || mem_assoc a l2.
+Proof using. introv. unfolds. rewrite~ app_exists_st. Qed.
 
 Lemma keys_mem_assoc : forall A B (l : list (A * B)) a,
   mem a (keys l) = mem_assoc a l.

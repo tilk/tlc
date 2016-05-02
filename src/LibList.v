@@ -1338,6 +1338,25 @@ Proof using.
     introv [E|M]; apply IHl; substs*.
 Qed.
 
+Lemma app_assoc_l : forall x l1 l2,
+  mem_assoc x l1 ->
+  assoc x (l1 ++ l2) = assoc x l1.
+Proof.
+  introv M. induction l1; tryfalse.
+  destruct a as [a b]. rewrite mem_assoc_cons in M. rew_refl in M.
+  simpl. case_if as I; substs; case_if~. inverts M as M; tryfalse~.
+  unfold append in IHl1. rewrite~ IHl1.
+Qed.
+
+Lemma app_assoc_r : forall x l1 l2,
+  ~ mem_assoc x l1 ->
+  assoc x (l1 ++ l2) = assoc x l2.
+Proof.
+  introv M. induction~ l1.
+  destruct a as [a b]. rewrite mem_assoc_cons in M. rew_refl in M. rew_logic in M.
+  simpl. case_if*. false*.
+Qed.
+
 End MemAssocProperties.
 
 

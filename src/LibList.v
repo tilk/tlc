@@ -1338,7 +1338,7 @@ Proof using.
     introv [E|M]; apply IHl; substs*.
 Qed.
 
-Lemma app_assoc_l : forall x l1 l2,
+Lemma app_assoc_l : forall A B `{Comparable A} `{Inhab B} x (l1 l2 : list (A * B)),
   mem_assoc x l1 ->
   assoc x (l1 ++ l2) = assoc x l1.
 Proof.
@@ -1348,7 +1348,7 @@ Proof.
   unfold append in IHl1. rewrite~ IHl1.
 Qed.
 
-Lemma app_assoc_r : forall x l1 l2,
+Lemma app_assoc_r : forall A B `{Comparable A} `{Inhab B} x (l1 l2 : list (A * B)),
   ~ mem_assoc x l1 ->
   assoc x (l1 ++ l2) = assoc x l2.
 Proof.
@@ -2371,6 +2371,27 @@ Lemma nth_def_if_in_length : forall l d n v,
 Proof using.
   introv I E. forwards (v'&Nv): length_Nth_lt I.
   erewrite Nth_to_nth_def in E; [| apply~ Nv ]. substs~.
+Qed.
+
+Lemma Nth_map : forall B l x n (f : A -> B),
+  Nth n l x -> Nth n (map f l) (f x).
+Proof.
+  introv N. gen n. induction l; introv N.
+   inverts N.
+   rewrite map_cons. inverts N as N.
+    constructors~.
+    apply IHl in N. constructors~.
+Qed.
+
+Lemma Nth_map_inv : forall B l y n (f : A -> B),
+  Nth n (map f l) y ->
+  exists x, y = f x /\ Nth n l x.
+Proof.
+  introv N. gen n. induction l; introv N.
+   inverts N.
+   rewrite map_cons in N. inverts N as N.
+    autos*.
+    apply IHl in N. lets (x&E&N'): (rm N). exists* x.
 Qed.
 
 End NthProperties.

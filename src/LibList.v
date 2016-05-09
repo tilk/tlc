@@ -174,7 +174,7 @@ Qed.
 Fixpoint mem x l :=
   match l with
   | nil => false
-  | y::l' => (x '= y) || mem x l'
+  | y::l' => decide (x = y) || mem x l'
   end.
 
 Definition remove x :=
@@ -272,7 +272,7 @@ Implicit Arguments append [[A]].
 Implicit Arguments concat [[A]].
 Implicit Arguments rev [[A]].
 Implicit Arguments length [[A]].
-Implicit Arguments mem [[A]].
+Implicit Arguments mem [[A] [CA]].
 Implicit Arguments remove [[A] [CA]].
 Implicit Arguments removes [[A] [CA]].
 Implicit Arguments take_drop_last [[A] [IA]].
@@ -515,11 +515,12 @@ Qed.
 
 Section MemProp.
 Implicit Types k : A.
+Hypothesis CA : Comparable A.
 Lemma mem_nil : forall k,
   mem k nil = false.
 Proof using. auto. Qed.
 Lemma mem_cons : forall k x l,
-  mem k (x::l) = (k '= x) || (mem k l).
+  mem k (x::l) = decide (k = x) || (mem k l).
 Proof using. auto. Qed.
 Lemma mem_app : forall f l1 l2,
   mem f (l1 ++ l2) = (mem f l1) || mem f l2.
@@ -530,17 +531,17 @@ Proof using.
   rewrite~ assoc_or.
 Qed.
 Lemma mem_last : forall k x l,
-  mem k (l & x) = (k '= x) || (mem k l).
+  mem k (l & x) = decide (k = x) || (mem k l).
 Proof using.
   intros. rewrite mem_app. simpl.
   rewrite LibBool.comm_or. rew_bool. auto.
 Qed.
 Lemma mem_cons_eq : forall x l,
   mem x (x::l) = true.
-Proof using. intros. simpl. rewrite~ eqb_self. Qed.
+Proof using. intros. simpl. rew_refl. rewrite~ eqb_self. Qed.
 Lemma mem_last_eq : forall x l,
   mem x (l & x) = true.
-Proof using. intros. rewrite mem_last. rewrite~ eqb_self. Qed.
+Proof using. intros. rewrite mem_last. rew_refl. rewrite~ eqb_self. Qed.
 
 Lemma rev_mem : forall l x,
   mem x l = mem x (rev l).
@@ -553,6 +554,9 @@ End MemProp.
 
 (* ---------------------------------------------------------------------- *)
 (** ** Concat *)
+
+Section ConcatProp.
+Hypothesis CA : Comparable A.
 
 Lemma concat_nil :
   concat (@nil (list A)) = nil.
@@ -595,6 +599,8 @@ Proof using.
      left~.
      right~. apply* IHLs.
 Qed.
+
+End ConcatProp.
 
 (* ---------------------------------------------------------------------- *)
 (** ** Map *)
@@ -648,6 +654,9 @@ Proof using.
    destruct l2 as [|e l2]; tryfalse. repeat rewrite map_cons in E.
     inverts E as E1 E2. forwards: inj E1. substs. fequals~.
 Qed.
+
+Hypothesis CA : Comparable A.
+Hypothesis CB : Comparable B.
 
 Lemma map_mem : forall l (x : B),
   mem x (map f l) <->
@@ -713,6 +722,8 @@ Proof using.
    rewrite filter_nil. constructors~.
    rewrite filter_cons. cases_if~.
 Qed.
+
+Hypothesis CA : Comparable A.
 
 Lemma filter_mem_eq : forall l a,
   mem a (filter f l) = (mem a l && f a).
@@ -1159,7 +1170,7 @@ Fixpoint assoc k l : B :=
   end.
 
 Definition mem_assoc k :=
-  exists_st (fun p:A*B => k '= fst p).
+  exists_st (fun p:A*B => decide (k = fst p)).
 
 Definition keys :=
   @map (A*B) A (@fst _ _).
@@ -1176,7 +1187,7 @@ Fixpoint remove_assoc k l : list (A*B) :=
 End Assoc.
 
 Implicit Arguments assoc [[A] [B] [IB] [CA]].
-Implicit Arguments mem_assoc [[A] [B]].
+Implicit Arguments mem_assoc [[A] [B] [CA]].
 Implicit Arguments keys [[A] [B]].
 Implicit Arguments remove_assoc [[A] [B] [CA]].
 
@@ -1233,7 +1244,7 @@ End AssocProperties.
 
 Section MemAssocProperties.
 
-Lemma assoc_mem_assoc : forall A B `{Inhab B} `{Comparable A} (l : list (A * B)) a,
+Lemma assoc_mem_assoc : forall A B `{Inhab B} `{Comparable A} `{Comparable B} (l : list (A * B)) a,
   mem_assoc a l ->
   mem (a, assoc a l) l.
 Proof using.
@@ -1244,13 +1255,13 @@ Proof using.
     do 2 unfolds in M. simpl in M. rew_refl in M. inverts* M.
 Qed.
 
-Lemma mem_assoc_assoc : forall A B `{Inhab B} `{Comparable A} (l : list (A * B)) a b,
+Lemma mem_assoc_assoc : forall A B `{Inhab B} `{Comparable A} `{Comparable B} (l : list (A * B)) a b,
   assoc a l = b ->
   mem_assoc a l ->
   mem (a, b) l.
 Proof using. introv E I. substs. apply~ assoc_mem_assoc. Qed.
 
-Lemma mem_assoc_map_fst : forall A B (l : list (A * B)) a,
+Lemma mem_assoc_map_fst : forall A B `{Comparable A} (l : list (A * B)) a,
   mem_assoc a l = mem a (map fst l).
 Proof using.
   extens. induction l as [|[a' b'] l]; iff I; tryfalse.
@@ -1262,7 +1273,7 @@ Proof using.
     left. apply~ IHl.
 Qed.
 
-Lemma mem_assoc_cons : forall A B (l : list (A * B)) a e,
+Lemma mem_assoc_cons : forall A B `{Comparable A} (l : list (A * B)) a e,
   mem_assoc a (e :: l) = (a '= fst e) || mem_assoc a l.
 Proof using.
   introv. extens. iff M.
@@ -1272,18 +1283,18 @@ Proof using.
     do 2 unfolds. simpl. rew_refl*.
 Qed.
 
-Lemma mem_assoc_nil : forall A B a,
+Lemma mem_assoc_nil : forall A B `{Comparable A} a,
   mem_assoc a (nil : list (A * B)) = false.
 Proof using. autos*. Qed.
 
-Lemma mem_mem_assoc : forall A B (l : list (A * B)) a b,
+Lemma mem_mem_assoc : forall A B `{Comparable A} `{Comparable B} (l : list (A * B)) a b,
   mem (a, b) l ->
   mem_assoc a l.
 Proof using.
   introv I. induction~ l. simpl in I. rewrite mem_assoc_cons. rew_refl in *. inverts* I.
 Qed.
 
-Lemma assoc_eq_mem_assoc : forall A B `{Inhab B} `{Comparable A} (l : list (A * B)) a,
+Lemma assoc_eq_mem_assoc : forall A B `{Inhab B} `{Comparable A} `{Comparable B} (l : list (A * B)) a,
   mem (a, assoc a l) l = mem_assoc a l.
 Proof using.
   introv. induction l as [|[a' b'] l].
@@ -1297,7 +1308,7 @@ Proof using.
     rew_refl. inverts I; tryfalse~. right. rewrite~ IHl.
 Qed.
 
-Lemma mem_assoc_exists_mem : forall A B (l : list (A * B)) a,
+Lemma mem_assoc_exists_mem : forall A B `{Comparable A} `{Comparable B} (l : list (A * B)) a,
   mem_assoc a l ->
   exists b, mem (a, b) l.
 Proof using.
@@ -1307,11 +1318,11 @@ Proof using.
    exists b'. simpl. rew_refl*.
 Qed.
 
-Lemma app_mem_assoc : forall A B (l1 l2 : list (A * B)) a,
+Lemma app_mem_assoc : forall A B `{Comparable A} (l1 l2 : list (A * B)) a,
   mem_assoc a (l1 ++ l2) = mem_assoc a l1 || mem_assoc a l2.
 Proof using. introv. unfolds. rewrite~ app_exists_st. Qed.
 
-Lemma keys_mem_assoc : forall A B (l : list (A * B)) a,
+Lemma keys_mem_assoc : forall A B `{Comparable A} (l : list (A * B)) a,
   mem a (keys l) = mem_assoc a l.
 Proof using. introv. unfold keys. rewrite~ <- mem_assoc_map_fst. Qed.
 
@@ -1695,6 +1706,8 @@ Lemma length_neq_elim : forall l1 l2,
   length l1 <> length l2 -> (l1 <> l2).
 Proof using. introv N E. subst. auto. Qed.
 
+Hypothesis CA : Comparable A.
+
 Lemma concat_eq_nil : forall L (l : list A),
   concat L = nil ->
   mem l L ->
@@ -1987,6 +2000,8 @@ Lemma Forall_inv : forall (P : A -> Prop) (a : A) (l : list A),
   Forall P (a :: l) -> P a /\ Forall P l.
 Proof using. introv F. inverts~ F. Qed.
 
+Hypothesis CA : Comparable A.
+
 Lemma Forall_iff_forall_mem : forall (P : A -> Prop) (l : list A),
   Forall P l <-> (forall x : A, mem x l -> P x).
 Proof using.
@@ -2155,6 +2170,7 @@ Implicit Arguments map_partial_inv [A B f lx ly].
 Section ExistsProp.
 Variables A : Type.
 Implicit Types l : list A.
+Hypothesis CA : Comparable A.
 
 Lemma Exists_nil_inv : forall (P : A -> Prop),
   Exists P nil -> False.
@@ -2211,7 +2227,7 @@ Qed.
 Lemma Exists_weaken : forall (P Q : A -> Prop) l,
   Exists P l -> pred_le P Q ->
   Exists Q l.
-Proof using.
+Proof using CA.
   introv E Impl. rewrite Exists_iff_exists_mem in *.
   lets (a&I&H): (rm E). exists a. splits*.
 Qed.
@@ -2232,7 +2248,7 @@ Qed.
 End ExistsProp.
 
 
-Lemma mem_split : forall A l (x:A),
+Lemma mem_split : forall A `{Comparable A} l (x:A),
   mem x l ->
   exists l1 l2,
     l = l1 ++ x :: l2 /\ ~ mem x l1.
@@ -2271,6 +2287,7 @@ Implicit Types l : list A.
 Implicit Types x : A.
 Implicit Types n : nat.
 Hint Constructors Nth.
+Hypothesis CA : Comparable A.
 
 Lemma Nth_lt_length : forall n l x,
   Nth n l x -> n < length l.
@@ -2307,10 +2324,10 @@ Lemma mem_Nth : forall l x,
   mem x l -> exists n, Nth n l x.
 Proof using.
   intros. induction l.
-  rewrite mem_nil in H. false.
-  rewrite mem_cons in H. rew_reflect in H. destruct H.
-   fold_prop. subst*.
-   forwards* [n ?]: IHl.
+   rewrite mem_nil in H. false.
+   rewrite mem_cons in H. rew_refl in H. destruct H.
+    subst*.
+    forwards* [n ?]: IHl.
 Qed.
 
 Implicit Arguments mem_Nth [l x].
@@ -2484,7 +2501,7 @@ Proof using.
     iff E. constructors*. inverts* E.
 Qed.
 
-Lemma Mem_mem : forall A l (a:A),
+Lemma Mem_mem : forall A `{Comparable A} l (a:A),
   Mem a l = mem a l.
 Proof using.
   introv. extens. induction l; iff I; inverts I as I;
@@ -2607,15 +2624,17 @@ Proof using.
   intros. applys~ Filter_disjoint_predicates_length P (fun x => ~ P x) L.
 Qed.
 
+Hypothesis CA : Comparable A.
+
 Lemma filter_No_duplicates : forall (L:list A) p,
   No_duplicates L -> No_duplicates (filter p L).
-Proof using.
+Proof using CA.
   Hint Constructors No_duplicates.
   introv H. induction H.
   rewrite* filter_nil.
   rewrite filter_cons. case_if.
-    constructors*. introv N. rewrite Mem_mem in N. rewrite filter_mem_eq in N.
-     rew_refl in N. rewrite* <- Mem_mem in N.
+    constructors*. introv N. rewrite Mem_mem with (H := CA) in N .
+     rewrite filter_mem_eq in N. rew_refl in N. rewrite* <- Mem_mem in N.
     auto.
 Qed.
 
@@ -2680,28 +2699,28 @@ Proof using.
   math.
 Qed.
 
-Lemma No_duplicates_Nth : forall A (L : list A) n1 n2 a,
+Lemma No_duplicates_Nth : forall A `{Comparable A} (L : list A) n1 n2 a,
   No_duplicates L ->
   Nth n1 L a ->
   Nth n2 L a ->
   n1 = n2.
 Proof using.
-  introv NL. gen n1 n2. induction NL; introv N1 N2.
+  introv CA NL. gen n1 n2. induction NL; introv N1 N2.
    inverts N1.
    inverts N1 as N1; inverts N2 as N2; autos~.
-    apply Nth_mem in N2. rewrite <- Mem_mem in N2. false*.
-    apply Nth_mem in N1. rewrite <- Mem_mem in N1. false*.
+    apply Nth_mem with (CA := CA) in N2. rewrite <- Mem_mem in N2. false*.
+    apply Nth_mem with (CA := CA) in N1. rewrite <- Mem_mem in N1. false*.
 Qed.
 
-Lemma Nth_No_duplicates : forall A (L : list A),
+Lemma Nth_No_duplicates : forall A `{Comparable A} (L : list A),
   (forall n1 n2 a,
     Nth n1 L a ->
     Nth n2 L a ->
     n1 = n2) ->
   No_duplicates L.
 Proof using.
-  introv NL. induction L; constructors.
-   introv I. rewrite Mem_mem in I. lets (n&N): mem_Nth (rm I).
+  introv CA NL. induction L; constructors.
+   introv I. rewrite Mem_mem with (H := CA) in I. lets (n&N): mem_Nth (rm I).
     forwards* Ab: NL Nth_here Nth_next. inverts Ab.
    apply IHL. introv N1 N2. forwards G: NL.
     applys Nth_next N1.
@@ -2709,7 +2728,7 @@ Proof using.
     inverts~ G.
 Qed.
 
-Lemma No_duplicates_inv_app : forall A (L1 L2 : list A),
+Lemma No_duplicates_inv_app : forall A `{Comparable A} (L1 L2 : list A),
   No_duplicates (L1 ++ L2) ->
   No_duplicates L1 /\ No_duplicates L2 /\ ~ exists x, mem x L1 /\ mem x L2.
 Proof using.
@@ -2829,7 +2848,7 @@ Proof using.
   splits~. applys~ No_duplicates_length_le. introv Hx. rewrite~ <- R2.
 Qed.
 
-Lemma Remove_duplicates_mem : forall A (L:list A) a,
+Lemma Remove_duplicates_mem : forall A `{Comparable A} (L:list A) a,
   mem a (Remove_duplicates L) = mem a L.
 Proof using. introv. extens. repeat rewrite <- Mem_mem. apply~ Remove_duplicates_spec. Qed.
 

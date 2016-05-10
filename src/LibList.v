@@ -892,7 +892,6 @@ Qed.
 
 End OperationProperties.
 
-
 (* This lemma requires [rev_cons] to be parameterised to be proven,
   this putting it out of the section. *)
 Lemma map_rev : forall A B (f : A -> B) l,
@@ -903,9 +902,19 @@ Proof using.
    rewrite map_cons. rewrite rev_cons. rewrite map_last. rewrite rev_cons. rewrite~ IHl.
 Qed.
 
-
+Implicit Arguments mem_nil [A [CA]].
+Implicit Arguments mem_cons [A [CA]].
+Implicit Arguments mem_app [A [CA]].
+Implicit Arguments mem_last [A [CA]].
+Implicit Arguments mem_cons_eq [A [CA]].
+Implicit Arguments mem_last_eq [A [CA]].
+Implicit Arguments rev_mem [A [CA]].
+Implicit Arguments concat_mem [A [CA]].
+Implicit Arguments map_mem [A B [CA] [CB]].
+Implicit Arguments filter_mem_eq [A [CA]].
 Implicit Arguments length_zero_inv [A l].
 Implicit Arguments take_struct [A].
+
 
 Module TakeInt.
 Require Import LibInt.
@@ -971,6 +980,10 @@ Proof.
 Qed.
 
 End RemoveProperties.
+
+Implicit Arguments remove_mem [[CA]].
+Implicit Arguments removes_mem [[CA]].
+Implicit Arguments remove_id [[CA]].
 
 
 (* ---------------------------------------------------------------------- *)
@@ -1370,7 +1383,12 @@ Qed.
 
 End MemAssocProperties.
 
-
+Implicit Arguments assoc_cons [[IB] [CA]].
+Implicit Arguments assoc_here [[IB] [CA]].
+Implicit Arguments assoc_next [[IB] [CA]].
+Implicit Arguments remove_assoc_nil [[CA]].
+Implicit Arguments remove_assoc_cons [[CA]].
+Implicit Arguments assoc_remove_assoc [[IB] [CA]].
 
 
 (* ********************************************************************** *)
@@ -1735,6 +1753,8 @@ Implicit Arguments app_rev_eq_nil_inv [A l1 l2].
 Implicit Arguments nil_eq_app_rev_inv [A l1 l2].
 Implicit Arguments nil_eq_last_val_app_inv [A x l1 l2].
 Implicit Arguments cons_eq_last_val_app_inv [A x y l1 l2 l].
+Implicit Arguments concat_eq_nil [A [CA]].
+Implicit Arguments nil_mem [A [CA]].
 
 
 (* ---------------------------------------------------------------------- *)
@@ -2024,6 +2044,9 @@ Proof using. introv F I. rewrite Forall_iff_forall_mem in F. apply~ F. Qed.
 
 End ForallProp.
 
+Implicit Arguments Forall_iff_forall_mem [A [CA]].
+Implicit Arguments Forall_mem [A [CA]].
+
 Section ForallToConj.
 Variables (A : Type) (P : A->Prop).
 Hint Constructors Forall.
@@ -2247,6 +2270,9 @@ Qed.
 
 End ExistsProp.
 
+Implicit Arguments Exists_iff_exists_mem [A [CA]].
+Implicit Arguments Exists_weaken [A [CA]].
+
 
 Lemma mem_split : forall A `{Comparable A} l (x:A),
   mem x l ->
@@ -2330,12 +2356,10 @@ Proof using.
     forwards* [n ?]: IHl.
 Qed.
 
-Implicit Arguments mem_Nth [l x].
-
 Lemma mem_nth : forall l x,
   mem x l -> exists n, nth n l = x.
 Proof using.
-  intros. forwards [n P]: (mem_Nth H).
+  intros. forwards [n P]: mem_Nth H.
   exists n. apply~ Nth_to_nth.
 Qed.
 
@@ -2421,6 +2445,10 @@ Proof using.
   introv F N. forwards L: Forall2_length F. forwards I: Nth_lt_length N.
   rewrite L in I. forwards*: nth_def_if_in_length I.
 Qed.
+
+Implicit Arguments mem_Nth [[CA] l x].
+Implicit Arguments mem_nth [[CA]].
+Implicit Arguments Nth_mem [[CA]].
 
 (* ---------------------------------------------------------------------- *)
 (* ** Mem *)
@@ -2639,6 +2667,8 @@ Proof using CA.
 Qed.
 
 End FilterFacts.
+
+Implicit Arguments filter_No_duplicates [[CA]].
 
 
 (* ---------------------------------------------------------------------- *)
@@ -2937,3 +2967,4 @@ Proof using.
 Qed.
 
 End ListEquiv.
+

@@ -739,6 +739,14 @@ Qed.
 
 End FilterProp.
 
+Lemma filter_length : forall l p,
+  length (filter p l) + length (filter (fun a => ! p a) l) = length l.
+Proof.
+  introv. induction l.
+   reflexivity.
+   repeat rewrite filter_cons. cases_if as I; cases_if; repeat rewrite length_cons; math.
+Qed.
+
 
 (* ---------------------------------------------------------------------- *)
 (** ** Exists_st *)

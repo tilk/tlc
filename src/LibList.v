@@ -1389,6 +1389,31 @@ Proof.
   simpl. case_if*. false*.
 Qed.
 
+Lemma mem_assoc_filter : forall A B (CA : Comparable A) P (l : list (A * B)) a,
+  mem_assoc a (filter P l) ->
+  mem_assoc a l.
+Proof.
+  introv I. rewrite mem_assoc_map_fst in *. induction l as [|[a' b'] l'].
+   false*.
+   simpl. rew_refl. rewrite filter_cons in I. cases_if~. simpl in I. rew_refl in I.
+    inverts~ I.
+Qed.
+
+Lemma assoc_filter : forall A B (IN : Inhab B) (CA : Comparable A) p (l : list (A * B)) a,
+  p (a, assoc a l) = true ->
+  assoc a (filter p l) = assoc a l.
+Proof.
+  introv P. induction l as [|[a' b'] l'].
+   reflexivity.
+   simpl. case_if.
+    substs. rewrite filter_cons in *. case_if.
+     simpl. case_if*.
+     rewrite assoc_cons in P. case_if*.
+    rewrite filter_cons. case_if.
+     simpl. case_if*. apply~ IHl'. rewrite <- P. do 2 fequals. simpl. case_if*.
+     apply~ IHl'. rewrite <- P. do 2 fequals. simpl. case_if*.
+Qed.
+
 End MemAssocProperties.
 
 Implicit Arguments assoc_cons [[IB] [CA]].

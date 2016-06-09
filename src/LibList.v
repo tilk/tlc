@@ -741,7 +741,7 @@ End FilterProp.
 
 Lemma filter_length : forall l p,
   length (filter p l) + length (filter (fun a => ! p a) l) = length l.
-Proof.
+Proof using.
   introv. induction l.
    reflexivity.
    repeat rewrite filter_cons. cases_if as I; cases_if; repeat rewrite length_cons; math.
@@ -979,7 +979,7 @@ Qed.
 Lemma remove_id : forall l x,
   ~ mem x l ->
   l = remove x l.
-Proof.
+Proof using.
   introv M. induction~ l.
   unfolds. rewrite filter_cons. cases_if.
    rewrite IHl at 1; autos~.
@@ -1217,7 +1217,7 @@ Implicit Arguments remove_assoc [[A] [B] [CA]].
 (** ** Properties *)
 
 Section AssocProperties.
-Variable (A B : Type) (IB:Inhab B) (CA:Comparable A).
+Variable (A B : Type) (IB:Inhab B) (CA:Comparable A) (CB:Comparable B).
 Implicit Types x : A.
 Implicit Types l : list (A*B).
 
@@ -1259,6 +1259,21 @@ Proof using.
   introv D. induction l.
    reflexivity.
    destruct a. simpl. do 2 case_if~; simpl; case_if~.
+Qed.
+
+Lemma assoc_filter : forall p l a,
+  p (a, assoc a l) = true ->
+  assoc a (filter p l) = assoc a l.
+Proof using.
+  introv P. induction l as [|[a' b'] l'].
+   reflexivity.
+   simpl. lets R: assoc_cons (* WTF: [case_if] breaks this lemma otherwise *). case_if.
+    substs. rewrite filter_cons. case_if.
+     simpl. case_if*.
+     rewrite R in P. case_if*.
+    rewrite filter_cons. case_if.
+     simpl. case_if*. apply~ IHl'. rewrite <- P. do 2 fequals. simpl. case_if*.
+     apply~ IHl'. rewrite <- P. do 2 fequals. simpl. case_if*.
 Qed.
 
 End AssocProperties.
@@ -1373,7 +1388,7 @@ Qed.
 Lemma app_assoc_l : forall A B `{Comparable A} `{Inhab B} x (l1 l2 : list (A * B)),
   mem_assoc x l1 ->
   assoc x (l1 ++ l2) = assoc x l1.
-Proof.
+Proof using.
   introv M. induction l1; tryfalse.
   destruct a as [a b]. rewrite mem_assoc_cons in M. rew_refl in M.
   simpl. case_if as I; substs; case_if~. inverts M as M; tryfalse~.
@@ -1383,7 +1398,7 @@ Qed.
 Lemma app_assoc_r : forall A B `{Comparable A} `{Inhab B} x (l1 l2 : list (A * B)),
   ~ mem_assoc x l1 ->
   assoc x (l1 ++ l2) = assoc x l2.
-Proof.
+Proof using.
   introv M. induction~ l1.
   destruct a as [a b]. rewrite mem_assoc_cons in M. rew_refl in M. rew_logic in M.
   simpl. case_if*. false*.
@@ -1392,26 +1407,23 @@ Qed.
 Lemma mem_assoc_filter : forall A B (CA : Comparable A) P (l : list (A * B)) a,
   mem_assoc a (filter P l) ->
   mem_assoc a l.
-Proof.
+Proof using.
   introv I. rewrite mem_assoc_map_fst in *. induction l as [|[a' b'] l'].
    false*.
    simpl. rew_refl. rewrite filter_cons in I. cases_if~. simpl in I. rew_refl in I.
     inverts~ I.
 Qed.
 
-Lemma assoc_filter : forall A B (IN : Inhab B) (CA : Comparable A) p (l : list (A * B)) a,
-  p (a, assoc a l) = true ->
-  assoc a (filter p l) = assoc a l.
-Proof.
-  introv P. induction l as [|[a' b'] l'].
-   reflexivity.
-   simpl. case_if.
-    substs. rewrite filter_cons in *. case_if.
-     simpl. case_if*.
-     rewrite assoc_cons in P. case_if*.
-    rewrite filter_cons. case_if.
-     simpl. case_if*. apply~ IHl'. rewrite <- P. do 2 fequals. simpl. case_if*.
-     apply~ IHl'. rewrite <- P. do 2 fequals. simpl. case_if*.
+Lemma forall_mem_assoc : forall l a b,
+  (forall b', mem (a, b') l -> b' = b) ->
+  mem_assoc a l ->
+  assoc a l = b.
+Proof using.
+  introv F I. induction l.
+   false*.
+   rewrite mem_assoc_cons in I. rew_refl in I. destruct a0. rewrite assoc_cons. case_if.
+    substs. apply~ F. simpl. rew_refl*.
+    inverts I as I; tryfalse~. apply~ IHl. introv I'. apply F. simpl. rew_refl*.
 Qed.
 
 End MemAssocProperties.
@@ -2449,7 +2461,7 @@ Qed.
 
 Lemma Nth_map : forall B l x n (f : A -> B),
   Nth n l x -> Nth n (map f l) (f x).
-Proof.
+Proof using.
   introv N. gen n. induction l; introv N.
    inverts N.
    rewrite map_cons. inverts N as N.
@@ -2460,7 +2472,7 @@ Qed.
 Lemma Nth_map_inv : forall B l y n (f : A -> B),
   Nth n (map f l) y ->
   exists x, y = f x /\ Nth n l x.
-Proof.
+Proof using.
   introv N. gen n. induction l; introv N.
    inverts N.
    rewrite map_cons in N. inverts N as N.

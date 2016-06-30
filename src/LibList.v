@@ -2480,6 +2480,21 @@ Proof using.
     apply IHl in N. lets (x&E&N'): (rm N). exists* x.
 Qed.
 
+Lemma Nth_rev : forall n x l,
+  Nth n l x ->
+  Nth (length l - 1 - n) (rev l) x.
+Proof using.
+  introv. sets_eq N: (length l). gen x n l. induction N; introv E I; destruct l; tryfalse.
+   inverts I.
+   rewrite rev_cons. inverts I as I.
+    applys Nth_app_r 0.
+     constructors.
+     rewrite length_rev. rewrite length_cons in E. math.
+    apply IHN in I.
+     apply Nth_app_l. asserts_rewrite~ (S N - 1 - S n0 = N - 1 - n0). math.
+     inverts~ E.
+Qed.
+
 End NthProperties.
 
 Lemma Forall2_Nth_nth_def : forall A B (P : A -> B -> Prop) la lb n v d,
@@ -2817,6 +2832,18 @@ Proof using.
    introv (x&I1&I2). rewrite <- Mem_mem in *. induction I1; rew_list in ND.
     inverts ND as ND1 ND2. false ND1. apply* Mem_app_or.
     apply IHI1. inverts~ ND.
+Qed.
+
+Lemma No_duplicates_rev : forall A `{Comparable A} (l : list A),
+  No_duplicates l ->
+  No_duplicates (rev l).
+Proof using.
+  introv CA ND. induction l.
+   constructors.
+   apply~ Nth_No_duplicates.
+    introv N1 N2. forwards O1: Nth_lt_length N1. forwards O2: Nth_lt_length N2.
+     apply Nth_rev in N1. apply Nth_rev in N2. rewrite rev_rev in *.
+     forwards~: No_duplicates_Nth N1 N2. math.
 Qed.
 
 

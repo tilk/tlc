@@ -14,27 +14,40 @@ SHELL := /bin/bash
 # COQBIN     (default: empty)
 # COQINCLUDE (default: empty)
 # V          (default: *.v)
+# V_AUX      (default: undefined/empty)
 # SERIOUS    (default: undefined)
 #            (if defined, coqc is used to produce .vo files in the old way)
-
-ifndef V
-	V := $(wildcard *.v)
-endif
+# VERBOSE    (default: undefined)
+#            (if defined, commands are displayed)
 
 # We usually refer to the .v files using relative paths (such as Foo.v)
 # but [coqdep -R] produces dependencies that refer to absolute paths
 # (such as /bar/Foo.v). This confuses [make], which does not recognize
 # that these files are the same. As a result, [make] does not respect
 # the dependencies.
-# We fix this, for the moment, by using absolute paths everywhere.
-# Not sure if this is quite right:
-PWD := $(shell pwd)
-V   := $(patsubst %,$(PWD)/%,$(wildcard *.v))
 
-VD  := $(patsubst %.v,%.v.d,$(V))
+# We fix this by using ABSOLUTE PATHS EVERYWHERE. The paths used in targets,
+# in -R options, etc., must be absolute paths.
+
+ifndef V
+	PWD := $(shell pwd)
+	V := $(wildcard $(PWD)/*.v)
+endif
+
+# Typically, $(V) should list only the .v files that we are ultimately
+# interested in checking. $(V_AUX) should list every other .v file in the
+# project. $(VD) is obtained from $(V) and $(V_AUX), so [make] sees all
+# dependencies and can rebuild files anywhere in the project, if needed, and
+# only if needed.
+
+ifndef VD
+	VD  := $(patsubst %.v,%.v.d,$(V) $(V_AUX))
+endif
+
 VIO := $(patsubst %.v,%.vio,$(V))
 VQ  := $(patsubst %.v,%.vq,$(V))
 VO  := $(patsubst %.v,%.vo,$(V))
+
 
 ############################################################################
 # Binaries
@@ -61,6 +74,22 @@ quick: $(VIO)
 proof_vo: $(VO)
 
 ############################################################################
+# Verbosity control.
+
+# Our commands are pretty long (due, among other things, to the use of
+# absolute paths everywhere). So, we hide them by default, and echo a short
+# message instead. However, sometimes one wants to see the command.
+
+# By default, VERBOSE is undefined, so the .SILENT directive is read, so no
+# commands are echoed. If VERBOSE is defined by the user, then the .SILENT
+# directive is ignored, so commands are echoed, unless they begin with an
+# explicit @.
+
+ifndef VERBOSE
+.SILENT:
+endif
+
+############################################################################
 # Verbosity filter.
 
 # Coq is way too verbose when using one of the -schedule-* commands.
@@ -85,32 +114,42 @@ proof_vo: $(VO)
 ifndef SERIOUS
 
 %.vo: %.vio
-	@echo "Compiling $*..."
-	@set -o pipefail; ( \
+	@echo "Compiling `basename $*`..."
+	set -o pipefail; ( \
 	  $(COQC) $(COQINCLUDE) -schedule-vio2vo 1 $* \
 	  2>&1 | (grep -v 'Checking task' || true))
 
+# The recipe for producing %.vio destroys %.vo. In other words, we do not
+# allow a young .vio file to co-exist with an old (possibly out-of-date) .vo
+# file, because this seems to lead Coq into various kinds of problems
+# ("inconsistent assumption" errors, "undefined universe" errors, warnings
+# about the existence of both files, and so on). Destroying %.vo should be OK
+# as long as the user does not try to build a mixture of .vo and .vio files in
+# one invocation of make.
 %.vio: %.v
+	@echo "Digesting `basename $*`..."
+	rm -f $*.vo
 	$(COQC) $(COQINCLUDE) -quick $<
 
 %.vq: %.vio
-	@echo "Checking $*..."
-	@set -o pipefail; ( \
+	@echo "Checking `basename $*`..."
+	set -o pipefail; ( \
 	  $(COQC) $(COQINCLUDE) -schedule-vio-checking 1 $< \
 	  2>&1 | (grep -v 'Checking task' || true))
-	@touch $@
+	touch $@
 
 endif
 
 ifdef SERIOUS
 
 %.vo: %.v
+	@echo "Compiling `basename $*`..."
 	$(COQC) $(COQINCLUDE) $<
 
 endif
 
 _CoqProject: .FORCE
-	echo $(COQINCLUDE) > $@
+	@echo $(COQINCLUDE) > $@
 
 .FORCE:
 
@@ -136,13 +175,12 @@ ide: _CoqProject
 ############################################################################
 # Clean
 
-# Do not delete intermediate files.
-.SECONDARY: %.v.d %.vio
-.PRECIOUS: %.v.d %.vio
-
 .PHONY: clean
 
 clean::
 	rm -f *~
-	rm -f *.vio *.v.d *.vo *.vq *.vk *.aux .*.aux *.glob *.cache
+	rm -f $(patsubst %.v,%.v.d,$(V)) # not $(VD)
+	rm -f $(VIO) $(VO) $(VQ)
+	rm -f *.aux .*.aux *.glob *.cache *.crashcoqide
 	rm -rf .coq-native .coqide
+# TEMPORARY *~, *.aux, etc. do not make sense in a multi-directory setting

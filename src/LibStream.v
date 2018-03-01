@@ -4,7 +4,7 @@
 **************************************************************************)
 
 Set Implicit Arguments.
-Generalizable Variables A B.
+Generalizable Variables A B C.
 From TLC Require Import LibTactics LibLogic LibInt LibList LibRelation LibWf.
 
 
@@ -50,6 +50,12 @@ Fixpoint take A (n:nat) (s:stream A) : list A :=
 
 CoFixpoint map A B (f:A->B) (s:stream A) : stream B :=
   let '(x:::s') := s in f x ::: (map f s').
+
+(** Zipping two streams with a function *)
+
+CoFixpoint zipWith A B C (f:A->B->C) (s1:stream A) (s2 : stream B) : stream C :=
+  let '(x1:::s1') := s1 in 
+  let '(x2:::s2') := s2 in f x1 x2 ::: (zipWith f s1' s2').
 
 (** N-th element of a stream *)
 

@@ -2614,9 +2614,10 @@ Inductive Forall A (P:A->Prop) : list A -> Prop :=
       Forall P (x::l).
 
 Section ForallProp.
-Variables A : Type.
+Variables A B : Type.
 Implicit Types l : list A.
 Implicit Types P : A->Prop.
+Implicit Types R : B->Prop.
 Hint Constructors Forall.
 
 (* Rewriting *)
@@ -2758,6 +2759,11 @@ Proof using.
   introv E. forwards (q&K): drop_is_suffix n l. 
   rewrite K in E. rewrite* Forall_app_eq in E.
 Qed.
+
+Lemma Forall_map : forall R f l,
+  (forall y, R (f y)) ->
+  Forall R (map f l).
+Proof using. introv I. induction l; rew_listx~. Qed.
 
 Lemma Forall_pred_incl : forall P Q l,
   Forall P l -> 

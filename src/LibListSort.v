@@ -1,4 +1,4 @@
-(* ---under construction
+(* ---under construction *)
 
 (**************************************************************************
 * TLC: A library for Coq                                                  *
@@ -38,33 +38,24 @@ Implicit Types l : list A.
 Implicit Types P : A->Prop.
 
 Hint Constructors permut_one.
+Hint Constructors rtclosure.
 
 (** Permutation is an equivalence *)
 
-(* --TODO: use [refl] [sym] [trans] predicates *)
+Lemma permut_refl : refl (@permut A).
+Proof using. apply refl_rtclosure. Qed.
 
-Lemma permut_refl : forall l,
-  permut l l.
-Proof using. intros. apply rtclosure_refl. Qed.
-
-Lemma permut_sym : forall l1 l2,
-  permut l1 l2 -> 
-  permut l2 l1.
-Proof using.
-  intros. induction H.
-  { apply permut_refl. }
-  { applys rtclosure_last. apply IHrtclosure. inverts~ H. }
-Qed.
+Lemma permut_sym : sym (@permut A).
+Proof using. apply sym_rtclosure. unfolds. introv Hp. inverts~ Hp. Qed.
 
 Lemma permut_sym_eq : forall l1 l2,
   permut l1 l2 = permut l2 l1.
 Proof using. intros. hint permut_sym. extens*. Qed.
 
-Lemma permut_trans : forall l2 l1 l3,
-  permut l1 l2 -> 
-  permut l2 l3 -> 
-  permut l1 l3.
+Lemma permut_trans : trans (@permut A).
 Proof using. intros. apply* rtclosure_trans. Qed.
+
+Hint Resolve permut_refl permut_trans.
 
 (** Permutation is a congruence with respect to [++] *)
 
@@ -72,22 +63,18 @@ Lemma permut_app_l : forall l1 l1' l2,
   permut l1 l1' ->
   permut (l1 ++ l2) (l1' ++ l2).
 Proof using.
-  introv H. gen l2. induction H; intros.
-  { apply permut_refl. }
-  { specializes IHrtclosure l2. inverts H.
-    rew_list in *. applys permut_trans.
-    { applys* rtclosure_step. } { apply permut_refl. } }
+  introv H. gen l2. induction H; intros; eauto.
+  inverts H. rew_list. unfolds*.
 Qed.
 
 Lemma permut_app_r : forall l1 l2 l2',
   permut l2 l2' ->
   permut (l1 ++ l2) (l1 ++ l2').
 Proof using.
-  introv H. gen l1. induction H; intros.
-  { apply permut_refl. }
-  { specializes IHrtclosure l1. inverts H.
-    rewrite <- app_assoc in *. applys permut_trans.
-    { applys* rtclosure_step. } { apply permut_refl. } }
+  introv H. gen l1. induction H; intros; eauto.
+  destruct H as [l2 l3 l4 l5].
+  lets H : (permut_one_intro (l1 ++ l2) l3 l4 l5).
+  rew_list in H. unfolds*.
 Qed.
 
 Lemma permut_app_lr : forall l1 l1' l2 l2',
@@ -95,8 +82,8 @@ Lemma permut_app_lr : forall l1 l1' l2 l2',
   permut l2 l2' ->
   permut (l1 ++ l2) (l1' ++ l2').
 Proof using.
-  intros. applys rtclosure_trans.
-  { applys* permut_app_l. } { apply* permut_app_r. }
+  introv Hp1 Hp2. applys rtclosure_trans.
+  { applys* permut_app_l Hp1. } { apply* permut_app_r. }
 Qed.
 
 Lemma permut_cons : forall x l1 l2,
@@ -110,7 +97,7 @@ Lemma permut_last : forall x l1 l2,
   permut l1 l2 ->
   permut (l1&x) (l2&x).
 Proof using.
-  intros. applys~ permut_app_lr. applys permut_refl.
+  intros. applys~ permut_app_lr.
 Qed.
 
 (** Other results *)
@@ -120,9 +107,8 @@ Lemma mem_permut_inv_r : forall l1 l2 x,
   permut l1 l2 ->
   mem x l2.
 Proof using.
-  introv M K. gen M. induction K as [|l2 l1 l3 H]; intros.
-  { auto. }
-  { inverts H. applys (rm IHK). repeat rewrite mem_app_eq in *. autos*. }
+  introv M K. gen M. induction K; intros; eauto.
+  inverts H. repeat rewrite mem_app_eq in *. autos*.
 Qed.
 
 Lemma mem_permut_inv_l : forall l1 l2 x,
@@ -130,10 +116,10 @@ Lemma mem_permut_inv_l : forall l1 l2 x,
   permut l2 l1 ->
   mem x l2.
 Proof using.
-  introv M K. hint permut_sym, mem_permut_inv_r. autos*. 
+  introv M K. hint permut_sym, mem_permut_inv_r. autos*.
 Qed. 
 
-Lemma permut_flip : forall l1 l2,
+Lemma permut_inverse : forall l1 l2,
   permut (l1 ++ l2) (l2 ++ l1).
 Proof using.
   intros. lets: (permut_one_intro nil l1 l2 nil).
@@ -144,7 +130,7 @@ Lemma permut_rev : forall l,
   permut l (rev l).
 Proof using.
   intros. induction l. apply permut_refl. rew_list.
-  lets M: (@permut_flip (a::nil) (rev l)). rew_list in M.
+  lets M: (@permut_inverse (a::nil) (rev l)). rew_list in M.
   applys~ permut_trans M. apply~ permut_cons.
 Qed.
 
@@ -168,7 +154,7 @@ Qed.  (* COQBUG? why [applys* mem_permut_inv_l] does not work *)
 
 End PermutProp.
 
-Hint Resolve permut_refl permut_flip permut_app_lr permut_cons
+Hint Resolve permut_refl permut_inverse permut_app_lr permut_cons
   permut_last permut_rev.
 
 
@@ -517,11 +503,11 @@ Hint Resolve sorted_nil sorted_one.
 Lemma heads_le_cons_l : forall x l1 l2,
   heads_le le (x::l1) l2 = head_le le x l2.
 Proof using. intros. destruct~ l2. Qed.
-
+(*
 Lemma heads_le_cons_r : forall x l1 l2,
   heads_le le l1 (x::l2) = head_le le x l1.
 Proof using. intros. destruct~ l1. Qed.
-
+*)
 Lemma heads_le_nil_l : forall l,
   heads_le le nil l.
 Proof using. intros. unfolds. destruct~ l. Qed.
@@ -530,21 +516,21 @@ Lemma heads_le_nil_r : forall l,
   heads_le le l nil.
 Proof using. intros. unfolds. destruct~ l. Qed.
 
-(** Simplification for flip *)
+(** Simplification for inverse *)
 
-Lemma heads_le_flip_eq : forall l1 l2,
-  heads_le (flip le) l1 l2 = heads_le le l2 l1.
+Lemma heads_le_inverse_eq : forall l1 l2,
+  heads_le (inverse le) l1 l2 = heads_le le l2 l1.
 Proof using. destruct l1; destruct l2; auto. Qed.
 
-Lemma heads_le_flip : forall l1 l2,
+Lemma heads_le_inverse : forall l1 l2,
   heads_le le l2 l1 -> 
-  heads_le (flip le) l1 l2.
-Proof using. intros. rewrite~ heads_le_flip_eq. Qed.
+  heads_le (inverse le) l1 l2.
+Proof using. intros. rewrite~ heads_le_inverse_eq. Qed.
 
-Lemma heads_le_flip_inv : forall l1 l2,
-  heads_le (flip le) l1 l2 -> 
+Lemma heads_le_inverse_inv : forall l1 l2,
+  heads_le (inverse le) l1 l2 -> 
   heads_le le l2 l1.
-Proof using. intros. rewrite~ <- heads_le_flip_eq. Qed.
+Proof using. intros. rewrite~ <- heads_le_inverse_eq. Qed.
 
 End HeadsLe.
 
@@ -555,7 +541,7 @@ End HeadsLe.
 (** [rsorted le l] asserts that [l] is sorted in reverse order 
     w.r.t. [le]. *)
 
-Definition rsorted A (le : binary A) := sorted (flip le).
+Definition rsorted A (le : binary A) := sorted (inverse le).
 
 Section RSorted.
 Variables (A : Type) (le : binary A).
@@ -581,7 +567,7 @@ Proof using. intros. applys* sorted_two. Qed.
 
 Lemma rsorted_cons : forall l x,
   rsorted le l ->
-  head_le (flip le) x l ->
+  head_le (inverse le) x l ->
   rsorted le (x::l).
 Proof using. introv S H. inverts~ S. Qed.
 
@@ -589,14 +575,14 @@ Proof using. introv S H. inverts~ S. Qed.
 
 Lemma rsorted_cons_inv : forall x l,
   rsorted le (x::l) -> 
-  head_le (flip le) x l /\ rsorted le l.
+  head_le (inverse le) x l /\ rsorted le l.
 Proof using. introv H. inverts H; simpls~. Qed.
-
+(*
 Lemma rsorted_cons_inv_head_le : forall x l1 l2,
   rsorted le (x::l2) ->
-  head_le (flip le) x l2.
+  head_le (inverse le) x l2.
 Proof using. introv E. forwards*: rsorted_cons_inv E. Qed.
-
+*)
 End RSorted.
 
 (** Append of a the reverse of a [rsorted] list and a [sorted] list. *)
@@ -623,7 +609,7 @@ Lemma rsorted_app_rev : forall (A : Type) (le : binary A) l1 l2,
   rsorted le ((rev l1) ++ l2).
 Proof using.
   unfold rsorted. intros. apply~ sorted_app_rev.
-  rewrite~ heads_le_flip_eq.
+  rewrite~ heads_le_inverse_eq.
 Qed.
 
 
@@ -633,7 +619,7 @@ Qed.
 (** [rsorts le l l'] asserts that [l'] is the result of sorting
     [l] in reverse order w.r.t. [le]. *)
 
-Definition rsorts A (le : binary A) := sorts (flip le).
+Definition rsorts A (le : binary A) := sorts (inverse le).
 
 Section Rsorts.
 Variables (A : Type).
@@ -647,7 +633,7 @@ Proof using. intros. apply~ sorts_refl. Qed.
 
 Lemma rsorts_cons : forall le l l' x,
   rsorts le l l' -> 
-  head_le (flip le) x l' ->
+  head_le (inverse le) x l' ->
   rsorts le (x::l) (x::l').
 Proof using. intros. applys~ sorts_cons. Qed.
 
@@ -697,10 +683,9 @@ Lemma rsorts_app_rev : forall le l1 l2,
   rsorted le l2 ->
   rsorts le (l1 ++ l2) (rev l1 ++ l2).
 Proof using.
-  introv H S1 S2. applys* sorts_app_rev. rewrite~ heads_le_flip_eq.
+  introv H S1 S2. applys* sorts_app_rev. rewrite~ heads_le_inverse_eq.
 Qed.
 
 End SortsApp.
 
 
-*)

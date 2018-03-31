@@ -2400,6 +2400,15 @@ Proof using. auto. Qed.
 
 Definition drop_cons := drop_succ.
 
+Lemma drop_plus : forall n1 n2 l,
+  drop (n1 + n2) l = drop n2 (drop n1 l).
+Proof using.
+  induction n1; intros n2 l; auto.
+  destruct l.
+  { repeat rewrite~ drop_nil. }
+  { simpl. rewrite~ IHn1. }
+Qed.
+
 Lemma drop_cons_pos : forall x l n,
   (n > 0) ->
   drop n (x::l) = drop (n-1) l.

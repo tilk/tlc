@@ -704,7 +704,7 @@ Proof using. constructor. introv I. rewrite union_comm. apply* @incl_union_l. Qe
 
 Global Instance union_incl_of_union_incl_eq :
   Union_incl_eq -> 
-  Union_incl_eq.
+  Union_incl.
 Proof using. constructor. intros_all. rewrite* union_incl_eq. Qed.
 
 Global Instance union_incl_inv_of_union_incl_eq :

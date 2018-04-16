@@ -3920,13 +3920,13 @@ Tactic Notation "specializes" "~" hyp(H) :=
   specializes H; auto_tilde.
 Tactic Notation "specializes" "~" hyp(H) constr(A1) :=
   specializes H A1; auto_tilde.
-Tactic Notation "specializes" hyp(H) constr(A1) constr(A2) :=
+Tactic Notation "specializes" "~" hyp(H) constr(A1) constr(A2) :=
   specializes H A1 A2; auto_tilde.
-Tactic Notation "specializes" hyp(H) constr(A1) constr(A2) constr(A3) :=
+Tactic Notation "specializes" "~" hyp(H) constr(A1) constr(A2) constr(A3) :=
   specializes H A1 A2 A3; auto_tilde.
-Tactic Notation "specializes" hyp(H) constr(A1) constr(A2) constr(A3) constr(A4) :=
+Tactic Notation "specializes" "~" hyp(H) constr(A1) constr(A2) constr(A3) constr(A4) :=
   specializes H A1 A2 A3 A4; auto_tilde.
-Tactic Notation "specializes" hyp(H) constr(A1) constr(A2) constr(A3) constr(A4) constr(A5) :=
+Tactic Notation "specializes" "~" hyp(H) constr(A1) constr(A2) constr(A3) constr(A4) constr(A5) :=
   specializes H A1 A2 A3 A4 A5; auto_tilde.
 
 Tactic Notation "fapply" "~" constr(E) :=
@@ -4297,15 +4297,15 @@ Tactic Notation "applys" "*" constr(E0) constr(A1) constr(A2) constr(A3) constr(
 
 Tactic Notation "specializes" "*" hyp(H) :=
   specializes H; auto_star.
-Tactic Notation "specializes" "~" hyp(H) constr(A1) :=
+Tactic Notation "specializes" "*" hyp(H) constr(A1) :=
   specializes H A1; auto_star.
-Tactic Notation "specializes" hyp(H) constr(A1) constr(A2) :=
+Tactic Notation "specializes" "*" hyp(H) constr(A1) constr(A2) :=
   specializes H A1 A2; auto_star.
-Tactic Notation "specializes" hyp(H) constr(A1) constr(A2) constr(A3) :=
+Tactic Notation "specializes" "*" hyp(H) constr(A1) constr(A2) constr(A3) :=
   specializes H A1 A2 A3; auto_star.
-Tactic Notation "specializes" hyp(H) constr(A1) constr(A2) constr(A3) constr(A4) :=
+Tactic Notation "specializes" "*" hyp(H) constr(A1) constr(A2) constr(A3) constr(A4) :=
   specializes H A1 A2 A3 A4; auto_star.
-Tactic Notation "specializes" hyp(H) constr(A1) constr(A2) constr(A3) constr(A4) constr(A5) :=
+Tactic Notation "specializes" "*" hyp(H) constr(A1) constr(A2) constr(A3) constr(A4) constr(A5) :=
   specializes H A1 A2 A3 A4 A5; auto_star.
 
 

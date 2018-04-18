@@ -2634,7 +2634,7 @@ Arguments take_drop_last_length [A] {IA}.
 
 Inductive insert A (x : A) : list A -> list A -> Prop :=
   | insert_here : forall l, insert x l (x::l)
-  | insert_next : forall y l1 l2,
+  | insert_cons : forall y l1 l2,
       insert x l1 l2 ->
       insert x (y::l1) (y::l2).
 
@@ -2702,10 +2702,25 @@ Proof.
   inverts Hnodup. inverts* Hmem. eauto using mem_insert.
 Qed.
 
-Lemma map_insert : forall (f : A -> B) x l l',
+Lemma insert_map : forall (f : A -> B) x l l',
   insert x l' l ->
   insert (f x) (map f l') (map f l).
 Proof. introv Hins. induction Hins; rew_listx; constructor~. Qed.
+
+Lemma insert_app_r : forall x l1 l2 l3,
+  insert x l1 l2 ->
+  insert x (l3 ++ l1) (l3 ++ l2).
+Proof. introv Hins. induction~ l3. rew_listx~. Qed.
+
+Lemma insert_app_l : forall x l1 l2 l3,
+  insert x l1 l2 ->
+  insert x (l1 ++ l3) (l2 ++ l3).
+Proof. introv Hins. induction Hins; rew_listx~. Qed.
+
+Lemma insert_last : forall x y l1 l2,
+  insert x l1 l2 ->
+  insert x (l1 & y) (l2 & y).
+Proof. introv Hins. induction Hins; rew_listx~. Qed.
 
 Lemma noduplicates_insert_ltr : forall x l l',
   noduplicates l ->

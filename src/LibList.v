@@ -1604,6 +1604,15 @@ Lemma mem_map : forall (A B:Type) (f:A->B) (l:list A) x,
   mem (f x) (map f l).
 Proof using. introv M. induction M; rew_listx; auto. Qed.
 
+Lemma mem_map_inv : forall (A B:Type) (f:A->B) (l:list A) x,
+  mem (f x) (map f l) ->
+  exists y, mem y l /\ f y = f x.
+Proof using.
+  hint mem_cons.
+  introv Hm. induction l; rew_listx in Hm; inverts* Hm.
+  specializes* IHl ___. destruct* IHl as (y&Hm&Heq).
+Qed.
+
 Lemma Nth_map : forall (A B:Type) (f:A->B) (l:list A) n (x:A),
   Nth n l x -> 
   Nth n (map f l) (f x).
@@ -1878,7 +1887,7 @@ Inductive noduplicates A : list A -> Prop :=
       noduplicates (x::l).
 
 Section Noduplicates.
-Variables (A : Type).
+Variables (A B : Type).
 Implicit Types l : list A.
 Hint Constructors noduplicates.
 
@@ -2002,6 +2011,16 @@ Lemma noduplicates_remove : forall a l,
 Proof using.
   intros. rewrite remove_as_filter. applys* noduplicates_filter.
 Qed.
+
+Lemma noduplicates_map_inv : forall (f : A -> B) l,
+  noduplicates (map f l) ->
+  noduplicates l.
+Proof.
+  introv Hnodup.
+  induction l; rew_listx in Hnodup; inverts Hnodup; constructor~.
+  eauto using mem_map.
+Qed.
+
 
 (* --TODO: noduplicates_rev *)
 
@@ -2607,6 +2626,100 @@ Arguments take_drop_last [A] {IA}.
 Arguments take_drop_last_spec [A] {IA}.
 Arguments take_drop_last_length [A] {IA}.
 
+(* ---------------------------------------------------------------------- *)
+(* ** insert *)
+
+(** [insert x L1 L2] asserts that [L2] is the list [L1] with [x] inserted
+    on some position. *)
+
+Inductive insert A (x : A) : list A -> list A -> Prop :=
+  | insert_here : forall l, insert x l (x::l)
+  | insert_next : forall y l1 l2,
+      insert x l1 l2 ->
+      insert x (y::l1) (y::l2).
+
+Section InsertProp.
+Variables (A B : Type).
+Implicit Types x : A.
+Implicit Types l : list A.
+
+Hint Constructors insert mem.
+
+Lemma insert_mem_ltr : forall x y l1 l2,
+  insert x l1 l2 ->
+  mem y l1 -> mem y l2.
+Proof. introv Hins Hmem. induction* Hins. inverts* Hmem. Qed.
+
+Lemma insert_mem_rtl : forall x y l1 l2,
+  insert x l1 l2 -> ~x = y ->
+  mem y l2 -> mem y l1.
+Proof. introv Hins Hneq Hmem. induction* Hins; inverts* Hmem. Qed.
+
+Lemma insert_mem_eq : forall x y l1 l2,
+  insert x l1 l2 -> ~x = y ->
+  mem y l1 = mem y l2.
+Proof.
+  introv Hins Hneq. extens. iff He; eauto using insert_mem_ltr, insert_mem_rtl.
+Qed.
+
+Lemma mem_insert_inv : forall x l,
+  mem x l ->
+  exists l', insert x l' l.
+Proof. introv Hmem. induction* Hmem. destruct* IHHmem. Qed.
+
+Lemma mem_insert : forall x l1 l2,
+  insert x l1 l2 -> mem x l2.
+Proof. introv Hins. induction* Hins. Qed.
+
+Lemma mem_insert_eq : forall x l,
+  mem x l = exists l', insert x l' l.
+Proof. 
+  extens. iff H. { apply~ mem_insert_inv. } { inverts H. apply* mem_insert. }
+Qed.
+
+Lemma noduplicates_insert_nomem : forall x l1 l2,
+  insert x l1 l2 -> noduplicates l2 -> ~mem x l1.
+Proof.
+  introv Hins Hnodup Hmem. induction Hins; inverts Hnodup; inverts* Hmem.
+  lets~ Hm : mem_insert Hins.
+Qed.
+
+Lemma noduplicates_insert : forall x l1 l2,
+  noduplicates l2 ->
+  insert x l1 l2 ->
+  noduplicates l1.
+Proof.
+  introv Hnodup Hins. inductions Hins; inverts Hnodup as Hnm Hnd; auto.
+  constructor~. intro Hm1. apply Hnm. applys~ insert_mem_ltr Hins.
+Qed.
+
+Lemma insert_duplicate : forall x l1 l2,
+  mem x l1 ->
+  insert x l1 l2 ->
+  ~noduplicates l2.
+Proof.
+  introv Hmem Hins Hnodup. induction Hins; tryfalse_invert.
+  inverts Hnodup. inverts* Hmem. eauto using mem_insert.
+Qed.
+
+Lemma map_insert : forall (f : A -> B) x l l',
+  insert x l' l ->
+  insert (f x) (map f l') (map f l).
+Proof. introv Hins. induction Hins; rew_listx; constructor~. Qed.
+
+Lemma noduplicates_insert_ltr : forall x l l',
+  noduplicates l ->
+  insert x l l' ->
+  ~mem x l ->
+  noduplicates l'.
+Proof.
+  introv Hn Hins Hm. induction* Hins; try solve [constructor*].
+  inverts Hn as Hn1 Hn2.
+  rewrite mem_cons_eq in Hm. rew_logic in Hm. destruct Hm as (Hm1&Hm2).
+  specializes~ IHHins ___. hint insert_mem_rtl. constructor*.
+Qed.
+
+End InsertProp.
 
 (* ---------------------------------------------------------------------- *)
 (* ** Forall *)
@@ -2793,6 +2906,35 @@ Lemma Forall_filter_pred_incl : forall P Q l,
   Forall Q (filter P l).
 Proof using.
   introv E. applys~ Forall_pred_incl P. applys Forall_filter_same.
+Qed.
+
+Lemma Forall_insert : forall P x l l', 
+  Forall P l ->
+  insert x l' l ->
+  Forall P l'.
+Proof. introv Hall Hins. induction Hins; inverts~ Hall. Qed.
+
+Lemma Forall_insert_elem : forall P x l l',
+  Forall P l ->
+  insert x l' l ->
+  P x.
+Proof. introv Hall Hins. induction Hins; inverts~ Hall. Qed.
+
+Lemma Forall_insert_inv : forall P x l l',
+  Forall P l' ->
+  insert x l' l ->
+  P x ->
+  Forall P l.
+Proof. introv Hall Hins Hp. induction Hins; inverts~ Hall. Qed.
+
+Lemma Forall_insert_eq : forall P x l l',
+  insert x l' l ->
+  Forall P l = (P x /\ Forall P l').
+Proof.
+  intros. extens. 
+  hint Forall_insert. iff* Hf.
+  - split. { applys* Forall_insert_elem Hf. } { applys* Forall_insert Hf. }
+  - applys* Forall_insert_inv Hf.
 Qed.
 
 End ForallProp.
